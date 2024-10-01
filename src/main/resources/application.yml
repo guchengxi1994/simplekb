@@ -12,7 +12,7 @@ spring:
     openai:
       chat:
         options:
-          model: ${CHAT_MODEL:Chat-2}
+          model: ${CHAT_MODEL:Chat}
       embedding:
         options:
           model: ${EMBEDDING_MODEL:Embed}
