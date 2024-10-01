@@ -1,0 +1,39 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/simplekb?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&useSSL=false&allowMultiQueries=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  ai:
+    openai:
+      chat:
+        options:
+          model: ${CHAT_MODEL:Chat-2}
+      embedding:
+        options:
+          model: ${EMBEDDING_MODEL:Embed}
+        base-url: ${OPEN_AI_HOST:http://127.0.0.1:9997}
+      api-key: ${SK:sk-X}
+      base-url: ${OPEN_AI_HOST:http://127.0.0.1:9997}
+
+server:
+  servlet:
+    context-path: /kb
+
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      logic-delete-field: isDeleted
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+qdrant:
+  host: 127.0.0.1
+  port: 6334
+  collection: simplekb
