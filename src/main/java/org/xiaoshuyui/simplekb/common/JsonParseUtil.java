@@ -19,7 +19,7 @@ public class JsonParseUtil {
         return gson.fromJson(removeMarkdown(jsonString), JsonObject.class);
     }
 
-    public static  <T> T parseToClass(String jsonString, Class<T> clazz) {
+    public static <T> T parseToClass(String jsonString, Class<T> clazz) {
         // 使用Gson解析JSON字符串
         return gson.fromJson(removeMarkdown(jsonString), clazz);
     }
