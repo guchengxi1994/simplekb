@@ -65,10 +65,21 @@ public class QdrantService {
         return client;
     }
 
+    /**
+     * 将文本内容转换为向量并插入到指定的集合中
+     *
+     * @param chunkId 文本块的唯一标识符，用于在向量数据库中唯一标识一个数据点
+     * @param content 要转换为向量并插入到数据库中的文本内容
+     * @throws ExecutionException 如果插入操作执行失败
+     * @throws InterruptedException 如果插入操作被中断
+     */
     public void insertVectorInString(long chunkId, String content) throws ExecutionException, InterruptedException {
+        // 创建一个HashMap来存储数据点的元数据信息
         HashMap<String, JsonWithInt.Value> payload = new HashMap<>();
+        // 将文本块的ID以键值对的形式添加到元数据中
         payload.put("chunk_id", value(chunkId));
 
+        // 获取文本内容的嵌入向量表示
         var vector = getEmbedding(content);
 
         // 构造一个Points.PointStruct对象，包含要插入的向量数据的ID和向量值

@@ -76,6 +76,16 @@ public class LLMController {
     @Resource
     private LLMService llmService;
 
+    /**
+     * 文件上传接口
+     *
+     * @param file 待上传的文件
+     * @return 返回一个SseEmitter对象，用于服务端发送事件给客户端
+     *
+     * 该方法的主要功能是接收客户端上传的文件，并通过SseEmitter向客户端发送文件上传的进度事件
+     * 使用单线程执行器异步处理文件上传任务，首先发送一个表示文件读取开始的事件，然后读取文件，
+     * 文件读取完成后发送一个表示文件读取完成的事件，并关闭SseEmitter连接
+     */
     @PostMapping("/upload")
     public SseEmitter upload(@RequestParam("file") MultipartFile file) {
         SseEmitter emitter = new SseEmitter(3 * 60 * 1000L);
@@ -93,6 +103,15 @@ public class LLMController {
         return emitter;
     }
 
+    /**
+     * 搜索接口
+     *
+     * @param content 搜索内容
+     * @return 返回一个Result对象，包含搜索结果或错误信息
+     *
+     * 该方法的主要功能是根据用户输入的内容，通过qdrantService获取对应的向量，并搜索相似的向量，
+     * 最后返回搜索到的chunkIds列表如果发生异常，则返回错误信息
+     */
     @PostMapping("/search")
     public Result search(@Param("content") String content) {
         try {
