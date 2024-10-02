@@ -18,39 +18,10 @@ import java.util.List;
 @Slf4j
 public class LLMService {
 
-    static final String prompt = """
-            你的目标是根据给定的文档类型，将以下文档按文档名称进行分类。
-            以下是文档类型：
-            {filetypes}
-                        
-            以下是一些示例分类：
-                        
-            1. 文档名称: "financial_report_2023.pdf"
-               分类: "财务报告"
-
-            2. 文档名称: "employee_contract_template.docx"
-               分类: "合同"
-                        
-            3. 文档名称: "presentation_slides_project.pptx"
-               分类: "演示文稿"
-                        
-            4. 文档名称: "monthly_sales_data.xlsx"
-               分类: "数据表"
-                        
-            5. 文档名称: "corporate_policies_guide.pdf"
-               分类: "政策文件"
-                        
-            6. 文档名称: "1.txt"
-               分类: "其它"
-                        
-            注意：仅给出结果，不需要推理过程。
-                        
-            现在，以下是要分类的文档名称：
-            {filename}
-                        
-            分类: 
-            """;
     static List<KbFileType> types = null;
+    @Resource
+    KbPromptService kbPromptService;
+    String prompt = null;
     private ChatClient defaultClient;
     @Resource
     private KbFileTypeMapper kbFileTypeMapper;
@@ -72,6 +43,14 @@ public class LLMService {
         if (types == null) {
             types = kbFileTypeMapper.getAllFileType();
         }
+
+        assert types != null;
+        if (prompt == null) {
+            prompt = kbPromptService.getByName("file_classify");
+        }
+
+        assert prompt != null;
+
         // 根据文件名进行分类
         String filetypes = types.stream().map(KbFileType::getName).reduce("", (a, b) -> a + "\n" + b);
         log.info("filetypes: {}", filetypes);

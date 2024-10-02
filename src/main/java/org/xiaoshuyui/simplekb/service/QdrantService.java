@@ -70,7 +70,7 @@ public class QdrantService {
      *
      * @param chunkId 文本块的唯一标识符，用于在向量数据库中唯一标识一个数据点
      * @param content 要转换为向量并插入到数据库中的文本内容
-     * @throws ExecutionException 如果插入操作执行失败
+     * @throws ExecutionException   如果插入操作执行失败
      * @throws InterruptedException 如果插入操作被中断
      */
     public void insertVectorInString(long chunkId, String content) throws ExecutionException, InterruptedException {
@@ -138,7 +138,7 @@ public class QdrantService {
         Points.SearchPoints points = Points.SearchPoints.newBuilder()
                 .setCollectionName(collection)  // 设置集合名称
                 .addAllVector(floatList)  // 添加向量列表
-                .setLimit(5)  // 设置返回结果的数量限制
+                .setLimit(topK)  // 设置返回结果的数量限制
                 .setWithPayload(enable(true))  // 设置是否携带有效载荷
                 .build();
 

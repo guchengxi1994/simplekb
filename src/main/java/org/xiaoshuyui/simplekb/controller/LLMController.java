@@ -11,7 +11,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.xiaoshuyui.simplekb.common.Result;
 import org.xiaoshuyui.simplekb.common.SseUtil;
+import org.xiaoshuyui.simplekb.entity.response.QuestionRewriteResponse;
 import org.xiaoshuyui.simplekb.entity.response.UploadFileResponse;
+import org.xiaoshuyui.simplekb.service.KbPromptService;
 import org.xiaoshuyui.simplekb.service.LLMService;
 import org.xiaoshuyui.simplekb.service.QdrantService;
 
@@ -24,53 +26,13 @@ import java.util.concurrent.Executors;
 @RequestMapping("/llm")
 public class LLMController {
 
-    static String questionRewriteTemplate = """
-            你的任务是重写用户提出的问题，去除无关的内容，增强问题的可读性。你需要关注用户的需求，并将其归类到特定的查询类别。请遵循以下步骤：
-                        
-            1. 去除问题中的多余信息或无关细节。
-            2. 保留问题的主要关键词。
-            3. 以简洁、直接的方式重新表达问题。
-            4. 根据问题的主题，将其归类到以下查询类别：
-               - 财务报告
-               - 合同
-               - 演示文稿
-               - 数据表
-               - 政策文件
-               - 其它
-                        
-            以下是几个示例：
-                        
-            示例 1:
-            提问："我想知道词典中关于《三国演义》的介绍，并且曹操是怎样的人。"
-            回答："查询类别: 其它 \s
-                  关键字: 三国演义; 曹操"
-                        
-            示例 2:
-            提问："请给我一些关于公司年度财务报告的概述，以及主要的财务指标。"
-            回答："查询类别: 财务报告 \s
-                  关键字: 年度财务报告; 财务指标"
-                        
-            示例 3:
-            提问："我需要一份新的合同模板，用于与供应商签署协议，你能推荐一些吗？"
-            回答："查询类别: 合同 \s
-                  关键字: 合同模板; 供应商协议"
-                        
-            示例 4:
-            提问："能给我一个关于新项目的演示文稿吗？"
-            回答："查询类别: 演示文稿 \s
-                  关键字: 新项目; 演示文稿"
-                        
-            示例 5:
-            提问："请告诉我，如何创建一个有效的数据表来跟踪销售业绩？"
-            回答："查询类别: 数据表 \s
-                  关键字: 销售业绩; 数据表"
-                        
-            请根据这些示例重写用户的问题，使之更清晰、简洁、易于理解，并归类到适当的查询类别。
-                        
-            提问：{question}
-            回答：
-                    
-            """;
+    @Resource
+    KbPromptService kbPromptService;
+
+    String questionRewriteTemplate = null;
+
+    String rewriteResultToJsonTemplate = null;
+
     @Resource
     private QdrantService qdrantService;
     @Resource
@@ -81,7 +43,7 @@ public class LLMController {
      *
      * @param file 待上传的文件
      * @return 返回一个SseEmitter对象，用于服务端发送事件给客户端
-     *
+     * <p>
      * 该方法的主要功能是接收客户端上传的文件，并通过SseEmitter向客户端发送文件上传的进度事件
      * 使用单线程执行器异步处理文件上传任务，首先发送一个表示文件读取开始的事件，然后读取文件，
      * 文件读取完成后发送一个表示文件读取完成的事件，并关闭SseEmitter连接
@@ -108,7 +70,7 @@ public class LLMController {
      *
      * @param content 搜索内容
      * @return 返回一个Result对象，包含搜索结果或错误信息
-     *
+     * <p>
      * 该方法的主要功能是根据用户输入的内容，通过qdrantService获取对应的向量，并搜索相似的向量，
      * 最后返回搜索到的chunkIds列表如果发生异常，则返回错误信息
      */
@@ -138,11 +100,41 @@ public class LLMController {
 
     @PostMapping("/question-rewrite")
     @Deprecated(since = "for test")
-    public Result questionRewrite(@Param("question") String question) {
-        String prompt = questionRewriteTemplate.replace("{question}", question);
-        var result = llmService.chat(prompt);
+    public SseEmitter questionRewrite(@Param("question") String question) {
+        SseEmitter emitter = new SseEmitter(3 * 60 * 1000L);
 
-        return Result.OK("ok", result);
+        Executors.newSingleThreadExecutor().submit(() -> {
+            QuestionRewriteResponse rewriteResponse = new QuestionRewriteResponse();
+            rewriteResponse.setContent("");
+            rewriteResponse.setStage("正在理解问题...");
+            SseUtil.sseSend(emitter, rewriteResponse);
+
+            if (questionRewriteTemplate == null) {
+                questionRewriteTemplate = kbPromptService.getByName("question_rewrite");
+            }
+
+            assert questionRewriteTemplate != null;
+
+            String prompt = questionRewriteTemplate.replace("{question}", question);
+            var result = llmService.chat(prompt);
+            rewriteResponse.setStage("正在重写问题...");
+            rewriteResponse.setContent(result);
+            SseUtil.sseSend(emitter, rewriteResponse);
+            if (rewriteResultToJsonTemplate == null) {
+                rewriteResultToJsonTemplate = kbPromptService.getByName("rewrite_to_json");
+            }
+
+            assert rewriteResultToJsonTemplate != null;
+
+            prompt = rewriteResultToJsonTemplate.replace("{content}", result);
+            result = llmService.chat(prompt);
+            rewriteResponse.setStage("回答结束");
+            rewriteResponse.setContent(result);
+            SseUtil.sseSend(emitter, rewriteResponse);
+            emitter.complete();
+        });
+
+        return emitter;
     }
 
     @PostMapping("/generate")
