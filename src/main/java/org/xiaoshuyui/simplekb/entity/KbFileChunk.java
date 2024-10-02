@@ -19,6 +19,9 @@ public class KbFileChunk {
     @TableField("chunk_content")
     private String content;
 
+    @TableField("chunk_title")
+    private String title;
+
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
     private int isDeleted;

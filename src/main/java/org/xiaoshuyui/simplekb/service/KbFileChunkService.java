@@ -24,7 +24,8 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
         for (Section content : contents) {
             KbFileChunk chunk = new KbFileChunk();
             chunk.setFileId(fileId);
-            chunk.setContent(content.getTitle() + "\n" + content.getContent());
+            chunk.setTitle(content.getTitle());
+            chunk.setContent(content.getContent());
             chunks.add(chunk);
 
         }

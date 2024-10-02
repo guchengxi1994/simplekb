@@ -31,6 +31,7 @@
         <mybatisspring.version>3.0.3</mybatisspring.version>
         <mybatisplus.version>3.5.5</mybatisplus.version>
         <swagger.version>2.5.0</swagger.version>
+        <tika.version>2.9.2</tika.version>
     </properties>
 
     <dependencyManagement>
@@ -145,6 +146,19 @@
             <version>5.3.0</version>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>${tika.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parsers-standard-package</artifactId>
+            <version>${tika.version}</version>
+        </dependency>
+
+
         <!--        向量数据库-->
         <dependency>
             <groupId>io.qdrant</groupId>
@@ -162,6 +176,11 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>33.3.1-jre</version> <!-- Replace with the appropriate version -->
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-parser-zip-commons</artifactId>
+            <version>2.9.2</version>
         </dependency>
     </dependencies>
 

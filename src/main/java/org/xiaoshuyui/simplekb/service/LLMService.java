@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.xiaoshuyui.simplekb.documentLoader.DocLoader;
+import org.xiaoshuyui.simplekb.documentLoader.Loader;
 import org.xiaoshuyui.simplekb.entity.KbFileType;
 import org.xiaoshuyui.simplekb.mapper.KbFileTypeMapper;
 
@@ -31,6 +31,9 @@ public class LLMService {
 
     @Resource
     private KbFileChunkService kbFileChunkService;
+
+    @Resource
+    private Loader loader;
 
     LLMService(@Qualifier("defaultChat") ChatClient defaultClient) {
         this.defaultClient = defaultClient;
@@ -71,7 +74,12 @@ public class LLMService {
         var fileId = kbFileService.newFile(file.getOriginalFilename(), typeId);
         // 提取文件内容并插入数据库
         try {
-            var sections = new DocLoader().extract(file.getInputStream());
+            var sections = loader.load(file.getOriginalFilename(), file.getInputStream());
+            if (sections == null){
+                return -1;
+            }
+
+            log.info("sections: {}", sections);
             // 将文件分块插入知识库
             if (!kbFileChunkService.insert(fileId, sections.getSections())) {
                 return -1;

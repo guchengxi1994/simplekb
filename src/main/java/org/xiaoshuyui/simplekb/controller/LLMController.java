@@ -98,42 +98,69 @@ public class LLMController {
         }
     }
 
-    @PostMapping("/question-rewrite")
+    /**
+     * 处理问题重写请求
+     * 该方法已弃用，仅用于测试目的
+     *
+     * @param question 需要重写的问题
+     * @return 返回一个SseEmitter对象，用于服务器发送事件给客户端
+     */
     @Deprecated(since = "for test")
+    @PostMapping("/question-rewrite")
     public SseEmitter questionRewrite(@Param("question") String question) {
+        // 创建一个SseEmitter实例，设置超时时间为3分钟
         SseEmitter emitter = new SseEmitter(3 * 60 * 1000L);
 
+        // 使用单线程执行器提交一个任务
         Executors.newSingleThreadExecutor().submit(() -> {
+            // 创建一个问题重写响应对象
             QuestionRewriteResponse rewriteResponse = new QuestionRewriteResponse();
+            // 初始化响应内容和阶段
             rewriteResponse.setContent("");
             rewriteResponse.setStage("正在理解问题...");
+            // 发送当前响应状态给客户端
             SseUtil.sseSend(emitter, rewriteResponse);
 
+            // 检查问题重写模板是否初始化，如果没有，则获取模板
             if (questionRewriteTemplate == null) {
                 questionRewriteTemplate = kbPromptService.getByName("question_rewrite");
             }
 
+            // 确保模板已经初始化
             assert questionRewriteTemplate != null;
 
+            // 使用问题替换模板中的占位符
             String prompt = questionRewriteTemplate.replace("{question}", question);
+            // 调用语言模型服务进行问题重写
             var result = llmService.chat(prompt);
+            // 更新响应阶段和内容
             rewriteResponse.setStage("正在重写问题...");
             rewriteResponse.setContent(result);
+            // 发送当前响应状态给客户端
             SseUtil.sseSend(emitter, rewriteResponse);
+
+            // 检查重写结果转换为JSON的模板是否初始化，如果没有，则获取模板
             if (rewriteResultToJsonTemplate == null) {
                 rewriteResultToJsonTemplate = kbPromptService.getByName("rewrite_to_json");
             }
 
+            // 确保模板已经初始化
             assert rewriteResultToJsonTemplate != null;
 
+            // 使用重写结果替换模板中的占位符
             prompt = rewriteResultToJsonTemplate.replace("{content}", result);
+            // 调用语言模型服务将重写结果转换为JSON格式
             result = llmService.chat(prompt);
+            // 更新响应阶段和内容
             rewriteResponse.setStage("回答结束");
             rewriteResponse.setContent(result);
+            // 发送当前响应状态给客户端
             SseUtil.sseSend(emitter, rewriteResponse);
+            // 完成发送事件
             emitter.complete();
         });
 
+        // 返回SseEmitter实例
         return emitter;
     }
 

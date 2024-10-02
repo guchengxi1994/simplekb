@@ -5,6 +5,7 @@ import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.usermodel.CharacterRun;
 import org.apache.poi.hwpf.usermodel.Paragraph;
 import org.apache.poi.hwpf.usermodel.Range;
+import org.springframework.stereotype.Component;
 import org.xiaoshuyui.simplekb.documentLoader.result.FontInfo;
 import org.xiaoshuyui.simplekb.documentLoader.result.Result;
 import org.xiaoshuyui.simplekb.documentLoader.result.Section;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
+@Component
 public class DocLoader implements BaseLoader {
     @Override
     /**
