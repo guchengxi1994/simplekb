@@ -5,6 +5,8 @@ import io.qdrant.client.QdrantGrpcClient;
 import io.qdrant.client.grpc.JsonWithInt;
 import io.qdrant.client.grpc.Points;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +33,20 @@ public class QdrantService {
     @Value("${qdrant.collection}")
     private String collection;
 
+    @Value("${qdrant.vector-size}")
+    private int vectorSize;
+
     private QdrantClient client;
+
+    private EmbeddingModel embeddingModel;
+
+    QdrantService(@Qualifier("defaultEmbedding") EmbeddingModel embeddingModel) {
+        this.embeddingModel = embeddingModel;
+    }
+
+    public float[] getEmbedding(String text) {
+        return embeddingModel.embed(text);
+    }
 
     public QdrantClient getClient() {
         if (client == null) {
@@ -40,7 +55,7 @@ public class QdrantService {
             try {
                 if (!client.collectionExistsAsync(collection).get()) {
                     client.createCollectionAsync(collection,
-                            io.qdrant.client.grpc.Collections.VectorParams.newBuilder().setDistance(io.qdrant.client.grpc.Collections.Distance.Dot).setSize(2).build()).get();
+                            io.qdrant.client.grpc.Collections.VectorParams.newBuilder().setDistance(io.qdrant.client.grpc.Collections.Distance.Dot).setSize(vectorSize).build()).get();
                     log.info("collection created");
                 }
             } catch (Exception e) {
@@ -48,6 +63,23 @@ public class QdrantService {
             }
         }
         return client;
+    }
+
+    public void insertVectorInString(long chunkId, String content) throws ExecutionException, InterruptedException {
+        HashMap<String, JsonWithInt.Value> payload = new HashMap<>();
+        payload.put("chunk_id", value(chunkId));
+
+        var vector = getEmbedding(content);
+
+        // 构造一个Points.PointStruct对象，包含要插入的向量数据的ID和向量值
+        Points.PointStruct pointStruct = Points.PointStruct.newBuilder()
+                .setId(id(chunkId))
+                .putAllPayload(payload)
+                .setVectors(vectors(vector))
+                .build();
+
+        // 异步执行向量数据的插入操作，并等待操作完成
+        Points.UpdateResult ignore = getClient().upsertAsync(collection, Collections.singletonList(pointStruct)).get();
     }
 
     /**

@@ -16,7 +16,7 @@ public class KbFile {
     @TableField("kb_file_name")
     private String name;
     @TableField("kb_file_type")
-    private int type;
+    private long type;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
     private int isDeleted;
