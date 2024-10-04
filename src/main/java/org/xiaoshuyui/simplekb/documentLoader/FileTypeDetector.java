@@ -1,11 +1,13 @@
 package org.xiaoshuyui.simplekb.documentLoader;
 
+import org.apache.tika.Tika;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import org.apache.tika.Tika;
 
 public class FileTypeDetector {
     static Tika tika = new Tika();
+
     /**
      * 通过文件输入流检测文件类型
      *
@@ -28,7 +30,7 @@ public class FileTypeDetector {
         return detectedType; // 返回检测到的文件类型
     }
 
-    public static String inferFileType(String fileName,String detectedType) {
+    public static String inferFileType(String fileName, String detectedType) {
         String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
         return switch (detectedType) {
             case "application/x-tika-msoffice", "application/zip" -> fileExtension;

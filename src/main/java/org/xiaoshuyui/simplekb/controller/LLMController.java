@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.xiaoshuyui.simplekb.common.HanlpUtils;
 import org.xiaoshuyui.simplekb.common.Result;
 import org.xiaoshuyui.simplekb.common.SseUtil;
 import org.xiaoshuyui.simplekb.entity.response.QuestionRewriteResponse;
 import org.xiaoshuyui.simplekb.entity.response.UploadFileResponse;
+import org.xiaoshuyui.simplekb.service.KbFileChunkService;
 import org.xiaoshuyui.simplekb.service.KbPromptService;
 import org.xiaoshuyui.simplekb.service.LLMService;
 import org.xiaoshuyui.simplekb.service.QdrantService;
@@ -37,6 +39,9 @@ public class LLMController {
     private QdrantService qdrantService;
     @Resource
     private LLMService llmService;
+
+    @Resource
+    private KbFileChunkService kbFileChunkService;
 
     /**
      * 文件上传接口
@@ -173,5 +178,13 @@ public class LLMController {
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
+    }
+
+    @PostMapping("/fulltext")
+    @Deprecated(since = "for test")
+    public Result fulltext(@Param("content") String content) {
+
+        var keywords = HanlpUtils.hanLPSegment(content);
+        return Result.OK("ok", kbFileChunkService.fullTextSearch(keywords));
     }
 }

@@ -22,8 +22,7 @@ public class Loader {
         String fileType = FileTypeDetector.getFileType(bis);
         String detectedType = FileTypeDetector.inferFileType(fileName, fileType);
 
-        switch (detectedType)
-        {
+        switch (detectedType) {
             case "doc":
                 return docLoader.extract(bis);
             default:

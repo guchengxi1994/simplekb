@@ -8,7 +8,9 @@ import org.xiaoshuyui.simplekb.entity.KbFileChunk;
 import org.xiaoshuyui.simplekb.mapper.KbFileChunkMapper;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChunk> {
@@ -18,6 +20,17 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
 
     @Resource
     private QdrantService qdrantService;
+
+    public List<KbFileChunk> fullTextSearch(List<String> keywords) {
+        Map<String, String> params = new HashMap<>();
+        StringBuffer keyword = new StringBuffer("");
+        for (String keywordStr : keywords) {
+            keyword.append("+" + keywordStr).append(" ");
+        }
+        params.put("keywords", keyword.toString());
+
+        return kbFileChunkMapper.searchByKeywords(params);
+    }
 
     public boolean insert(Long fileId, List<Section> contents) {
         List<KbFileChunk> chunks = new ArrayList<>();

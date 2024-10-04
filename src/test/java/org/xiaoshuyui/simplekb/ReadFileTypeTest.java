@@ -18,6 +18,6 @@ public class ReadFileTypeTest {
         String fileType2 = FileTypeDetector.getFileType(new BufferedInputStream(file2));
         System.out.println(fileType2);
 
-        System.out.println(FileTypeDetector.inferFileType("dbgpt.doc",fileType));
+        System.out.println(FileTypeDetector.inferFileType("dbgpt.doc", fileType));
     }
 }

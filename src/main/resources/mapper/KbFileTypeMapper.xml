@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.xiaoshuyui.simplekb.mapper.KbFileTypeMapper">
+
+
+    <select id="getTypeDetails" resultType="org.xiaoshuyui.simplekb.entity.response.Type">
+        SELECT t1.type_name         AS name,
+               COUNT(t2.kb_file_id) AS fileCount
+        FROM kb_file_type t1
+                 LEFT JOIN kb_file t2 ON t2.kb_file_type = t1.type_id AND t2.is_deleted = 0
+        WHERE t1.is_deleted = 0
+        GROUP BY t1.type_id
+        ORDER BY fileCount DESC
+    </select>
+</mapper>

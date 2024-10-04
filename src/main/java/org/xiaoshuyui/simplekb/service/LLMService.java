@@ -75,7 +75,7 @@ public class LLMService {
         // 提取文件内容并插入数据库
         try {
             var sections = loader.load(file.getOriginalFilename(), file.getInputStream());
-            if (sections == null){
+            if (sections == null) {
                 return -1;
             }
 
