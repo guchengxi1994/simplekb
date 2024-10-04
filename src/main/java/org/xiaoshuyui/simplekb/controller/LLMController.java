@@ -151,13 +151,11 @@ public class LLMController {
             var result = llmService.chat(prompt);
 
             // 更新响应内容和阶段
-            response.setContent(result);
-            response.setStage("问题改写完成");
+            response.setStage("问题改写完成。\n"+result);
             SseUtil.sseSend(emitter, response);
 
             // 更新阶段信息，开始关键字检索
             response.setStage("正在根据关键字检索...");
-            response.setContent("");
             SseUtil.sseSend(emitter, response);
 
             // 对问题进行分词，获取关键字
@@ -203,9 +201,6 @@ public class LLMController {
             // 根据文件块ID获取文件及其内容片段
             var fileWithChunks = kbFileService.getFileWithChunks(chunkIds2);
 
-            // 更新响应内容
-            response.setContent(fileWithChunks.toString());
-            SseUtil.sseSend(emitter, response);
 
             // 更新阶段信息，表示回答中
             response.setStage("回答中...");
@@ -220,6 +215,7 @@ public class LLMController {
             Disposable disposable = llmService
                     .streamChat(t).doOnComplete(() -> {
                         response.setDone(true);
+                        response.setStage("回答结束");
                         response.setContent("");
                         SseUtil.sseSend(emitter, response);
                         log.info("complete===> \n" + sb);

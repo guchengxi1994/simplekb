@@ -1,6 +1,14 @@
 # simplekb
 
+**Build a LLM knowledge base with SpringAI and flutter(web)**
+
+![image-20241004225748522](./images/image-20241004225748522.png)
+
+**structure**
+
 ![image-20241001233919593](./images/image-20241001233919593.png)
+
+
 
 **几个要点**:
 
