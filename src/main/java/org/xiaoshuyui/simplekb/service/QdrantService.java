@@ -1,5 +1,6 @@
 package org.xiaoshuyui.simplekb.service;
 
+import io.qdrant.client.PointIdFactory;
 import io.qdrant.client.QdrantClient;
 import io.qdrant.client.QdrantGrpcClient;
 import io.qdrant.client.grpc.JsonWithInt;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import static io.qdrant.client.ConditionFactory.hasId;
 import static io.qdrant.client.PointIdFactory.id;
 import static io.qdrant.client.ValueFactory.value;
 import static io.qdrant.client.VectorsFactory.vectors;
@@ -138,6 +140,31 @@ public class QdrantService {
         Points.SearchPoints points = Points.SearchPoints.newBuilder()
                 .setCollectionName(collection)  // 设置集合名称
                 .addAllVector(floatList)  // 添加向量列表
+                .setLimit(topK)  // 设置返回结果的数量限制
+                .setWithPayload(enable(true))  // 设置是否携带有效载荷
+                .build();
+
+        // 异步执行搜索操作，并等待结果
+        return getClient().searchAsync(points).get();
+    }
+
+    public List<Points.ScoredPoint> searchVector(float[] vector, int topK, List<Long> chunkIds) throws ExecutionException, InterruptedException {
+        // 将基本类型float的数组转换为Float的列表，以便于后续操作
+        List<Float> floatList = new ArrayList<>();
+        for (float f : vector) {
+            floatList.add(f);  // Autoboxing float to Float
+        }
+
+
+        Points.Condition condition = hasId(chunkIds.stream().map(PointIdFactory::id).toList());
+
+        Points.Filter filter = Points.Filter.newBuilder().addMust(condition).build();
+
+        // 构建搜索请求对象
+        Points.SearchPoints points = Points.SearchPoints.newBuilder()
+                .setCollectionName(collection)  // 设置集合名称
+                .addAllVector(floatList)  // 添加向量列表
+                .setFilter(filter)
                 .setLimit(topK)  // 设置返回结果的数量限制
                 .setWithPayload(enable(true))  // 设置是否携带有效载荷
                 .build();

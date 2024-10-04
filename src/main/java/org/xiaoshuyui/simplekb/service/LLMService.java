@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.xiaoshuyui.simplekb.documentLoader.Loader;
 import org.xiaoshuyui.simplekb.entity.KbFileType;
 import org.xiaoshuyui.simplekb.mapper.KbFileTypeMapper;
+import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.util.List;
@@ -95,5 +96,9 @@ public class LLMService {
 
     public String chat(String prompt) {
         return defaultClient.prompt().user(prompt).call().content();
+    }
+
+    public Flux<String> streamChat(String prompt) {
+        return defaultClient.prompt().user(prompt).stream().content();
     }
 }
