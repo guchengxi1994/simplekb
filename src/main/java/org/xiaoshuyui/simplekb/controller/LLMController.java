@@ -4,6 +4,7 @@ import io.qdrant.client.grpc.Points;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -62,6 +63,9 @@ public class LLMController {
 
     @Resource
     private KbFileChunkService kbFileChunkService;
+
+    @Value("${chunk.top-k}")
+    private int topK;
 
     /**
      * 文件上传接口
@@ -180,7 +184,7 @@ public class LLMController {
             // 使用Qdrant服务根据改写后的问题进行向量搜索，并限制返回结果数量
             List<Points.ScoredPoint> result2 = null;
             try {
-                result2 = qdrantService.searchVector(qdrantService.getEmbedding(result), 3, chunkIds);
+                result2 = qdrantService.searchVector(qdrantService.getEmbedding(result), topK, chunkIds);
             } catch (Exception e) {
                 response.setStage("");
                 response.setContent("查询相关条目异常。");

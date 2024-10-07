@@ -51,3 +51,4 @@ qdrant:
 
 chunk:
   max-length: 500
+  top-k: 3
