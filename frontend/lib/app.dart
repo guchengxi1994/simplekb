@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/chat_screen.dart';
 
+import 'classification/classification_screen.dart';
 import 'sidebar/sidebar.dart';
 import 'sidebar/sidebar_notifier.dart';
 
@@ -24,7 +25,7 @@ class _AppState extends ConsumerState<App> {
             controller: ref.read(sidebarProvider.notifier).pageController,
             children: [
               ChatScreen(),
-              Container(),
+              ClassificationScreen(),
             ],
           ))
         ],
