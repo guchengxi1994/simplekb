@@ -7,4 +7,38 @@
         SELECT DISTINCT keyword
         FROM kb_file_chunk_keywords
     </select>
+
+    <resultMap id="ChunkWithKeywordsResultMap" type="org.xiaoshuyui.simplekb.entity.response.ChunkWithKeywords">
+        <id column="content" property="content"/>
+        <result column="chunkId" property="chunkId"/>
+        <collection property="keywords" ofType="java.lang.String">
+            <result column="keyword"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="FileWithKeywordsResultMap" type="org.xiaoshuyui.simplekb.entity.response.FileWithKeywords">
+        <id column="fileId" property="fileId"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <collection property="chunks" ofType="org.xiaoshuyui.simplekb.entity.response.ChunkWithKeywords" resultMap="ChunkWithKeywordsResultMap"/>
+    </resultMap>
+
+
+    <select id="getFileWithKeywords" resultMap="FileWithKeywordsResultMap">
+        SELECT
+        f.kb_file_id AS fileId,
+        f.kb_file_name AS name,
+        ft.type_name AS type,
+        fc.chunk_id AS chunkId,
+        fc.chunk_content AS content,
+        kfck.keyword
+        FROM kb_file f
+        LEFT JOIN kb_file_chunk fc ON f.kb_file_id = fc.file_id
+        LEFT JOIN kb_file_chunk_keywords kfck ON fc.chunk_id = kfck.chunk_id
+        LEFT JOIN kb_file_type ft ON f.kb_file_type = ft.type_id
+        WHERE kfck.keyword IN
+        <foreach item="keyword" index="index" collection="keywords" open="(" separator="," close=")">
+            #{keyword}
+        </foreach>
+    </select>
 </mapper>

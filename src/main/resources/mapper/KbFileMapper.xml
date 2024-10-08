@@ -34,4 +34,55 @@
             </if>
         GROUP BY f.kb_file_id, c.chunk_id
     </select>
+
+
+
+    <resultMap id="ChunkWithKeywordsResultMap" type="org.xiaoshuyui.simplekb.entity.response.ChunkWithKeywords">
+        <id column="content" property="content"/>
+        <result column="chunkId" property="chunkId"/>
+        <collection property="keywords" ofType="java.lang.String">
+            <result column="keyword"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="FileWithKeywordsResultMap" type="org.xiaoshuyui.simplekb.entity.response.FileWithKeywords">
+        <id column="fileId" property="fileId"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <collection property="chunks" ofType="org.xiaoshuyui.simplekb.entity.response.ChunkWithKeywords" resultMap="ChunkWithKeywordsResultMap"/>
+    </resultMap>
+
+
+    <select id="getFileWithKeywordsById" resultMap="FileWithKeywordsResultMap">
+        SELECT
+            f.kb_file_id AS fileId,
+            f.kb_file_name AS name,
+            ft.type_name AS type,
+            fc.chunk_id AS chunkId,
+            fc.chunk_content AS content,
+            kfck.keyword
+        FROM kb_file f
+                 LEFT JOIN kb_file_chunk fc ON f.kb_file_id = fc.file_id
+                 LEFT JOIN kb_file_chunk_keywords kfck ON fc.chunk_id = kfck.chunk_id
+                 LEFT JOIN kb_file_type ft ON f.kb_file_type = ft.type_id
+        where f.kb_file_id = #{fileId}
+    </select>
+
+
+    <select id="getFileWithKeywordsByType"
+            resultMap="FileWithKeywordsResultMap">
+        SELECT f_paged.*,
+               ft.type_name     AS type,
+               fc.chunk_id      AS chunkId,
+               fc.chunk_content AS content,
+               kfck.keyword
+        FROM (SELECT f.kb_file_id as fileId, f.kb_file_name as name, f.kb_file_type
+              FROM kb_file f
+                       LEFT JOIN kb_file_type ft ON f.kb_file_type = ft.type_id
+              WHERE ft.type_name = #{type} LIMIT #{pageId}
+                  , #{pageSize}) AS f_paged
+                 LEFT JOIN kb_file_chunk fc ON f_paged.kb_file_id = fc.file_id
+                 LEFT JOIN kb_file_chunk_keywords kfck ON fc.chunk_id = kfck.chunk_id
+                 LEFT JOIN kb_file_type ft ON f_paged.kb_file_type = ft.type_id
+    </select>
 </mapper>

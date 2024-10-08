@@ -4,6 +4,7 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.xiaoshuyui.simplekb.entity.KbFile;
 import org.xiaoshuyui.simplekb.entity.response.FileWithChunks;
+import org.xiaoshuyui.simplekb.entity.response.FileWithKeywords;
 import org.xiaoshuyui.simplekb.mapper.KbFileMapper;
 
 import java.util.List;
@@ -23,5 +24,13 @@ public class KbFileService {
 
     public List<FileWithChunks> getFileWithChunks(List<Long> chunkIds) {
         return kbFileMapper.getFileWithChunks(chunkIds);
+    }
+
+    public FileWithKeywords getFileWithKeywordsById(Long fileId) {
+        return kbFileMapper.getFileWithKeywordsById(fileId);
+    }
+
+    public List<FileWithKeywords> getFileWithKeywordsByType(String type, int pageId, int pageSize) {
+        return kbFileMapper.getFileWithKeywordsByType(type, pageId, pageSize);
     }
 }
