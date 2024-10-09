@@ -2,6 +2,7 @@ package org.xiaoshuyui.simplekb.controller;
 
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +18,9 @@ import java.util.Collections;
 @RequestMapping("/file")
 @Slf4j
 public class FileController {
+
+    @Value("${filelist.page-size}")
+    private int pageSize;
 
     @Resource
     private kbFileTypeService kbFileTypeService;
@@ -45,7 +49,7 @@ public class FileController {
     }
 
     @GetMapping("/file-with-keywords-by-type")
-    public Result getFileWithKeywordsByType(@Param("type") Long type) {
-        return Result.OK_data(kbFileService.getFileWithKeywordsByType(type, 1, 2));
+    public Result getFileWithKeywordsByType(@Param("type") Long type, @Param("pageId") int pageId) {
+        return Result.OK_data(kbFileService.getFileWithKeywordsByType(type, pageId, pageSize));
     }
 }

@@ -15,6 +15,8 @@ class ClassificationState {
 class ClassificationTreeNode {
   String name;
   int count;
+  int id;
 
-  ClassificationTreeNode({required this.name, required this.count});
+  ClassificationTreeNode(
+      {required this.name, required this.count, required this.id});
 }

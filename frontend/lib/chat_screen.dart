@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/messagebox/chat_response.dart';
 
+import 'api/const.dart' show streamChatApi;
 import 'input/input_field.dart';
 import 'messagebox/error_messagebox.dart';
 import 'messagebox/llm_request_messagebox.dart';
@@ -10,8 +11,6 @@ import 'messagebox/messagebox_state.dart';
 import 'dart:convert'; // for jsonDecode
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html'; // 引入 dart:html 库
-
-const api = "http://localhost:8080/kb/llm/chat";
 
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({super.key});
@@ -29,16 +28,14 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       children: [
         Flexible(
             child: SizedBox.expand(
-              child: SingleChildScrollView(
-                controller: ref
-                    .read(messageProvider.notifier)
-                    .scrollController,
-                padding: const EdgeInsets.only(left: 20, right: 20),
-                child: Column(
-                  children: state.messageBox.map((e) => e.toWidget()).toList(),
-                ),
-              ),
-            )),
+          child: SingleChildScrollView(
+            controller: ref.read(messageProvider.notifier).scrollController,
+            padding: const EdgeInsets.only(left: 20, right: 20),
+            child: Column(
+              children: state.messageBox.map((e) => e.toWidget()).toList(),
+            ),
+          ),
+        )),
         InputField(onSubmit: (s) => _handleInputMessage(s, state))
       ],
     );
@@ -60,7 +57,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     // 发送 POST 请求
     request
-      ..open('POST', api)
+      ..open('POST', streamChatApi)
       ..setRequestHeader('Content-Type', 'application/json')
       ..onProgress.listen((event) {
         if (request.responseText != null) {

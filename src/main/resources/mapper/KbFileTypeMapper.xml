@@ -5,7 +5,8 @@
 
     <select id="getTypeDetails" resultType="org.xiaoshuyui.simplekb.entity.response.Type">
         SELECT t1.type_name         AS name,
-               COUNT(t2.kb_file_id) AS fileCount
+               COUNT(t2.kb_file_id) AS fileCount,
+               t1.type_id           AS typeId
         FROM kb_file_type t1
                  LEFT JOIN kb_file t2 ON t2.kb_file_type = t1.type_id AND t2.is_deleted = 0
         WHERE t1.is_deleted = 0

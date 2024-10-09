@@ -11,6 +11,7 @@ environment:
 
 
 dependencies:
+  data_table_2: ^2.5.15
   dio: ^5.7.0
   flutter:
     sdk: flutter
@@ -25,7 +26,7 @@ dependencies:
       ref: cb2ba3aa0a35e151d4ea03771966c3fad72d7786
 
 dev_dependencies:
-  build_runner: ^2.4.13
+  build_runner: ^2.4.13 # dart run build_runner build
   flutter_test:
     sdk: flutter
 

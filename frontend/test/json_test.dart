@@ -2,7 +2,7 @@
 
 import 'dart:convert';
 
-import 'package:frontend/api/base_model.dart';
+import 'package:frontend/api/models/base_model.dart';
 
 class User {
   String? name;

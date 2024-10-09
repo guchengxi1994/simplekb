@@ -6,4 +6,5 @@ import lombok.Data;
 public class Type {
     String name;
     int fileCount;
+    Long typeId;
 }
