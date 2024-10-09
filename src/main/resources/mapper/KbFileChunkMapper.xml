@@ -3,13 +3,13 @@
 <mapper namespace="org.xiaoshuyui.simplekb.mapper.KbFileChunkMapper">
 
     <resultMap id="kbFileChunkResultMap" type="org.xiaoshuyui.simplekb.entity.KbFileChunk">
-        <id property="id" column="chunk_id" />
-        <result property="fileId" column="file_id" />
-        <result property="content" column="chunk_content"  />
-        <result property="title" column="chunk_title"  />
-        <result property="createAt" column="create_at" />
-        <result property="updateAt" column="update_at" />
-        <result property="isDeleted" column="is_deleted" />
+        <id property="id" column="chunk_id"/>
+        <result property="fileId" column="file_id"/>
+        <result property="content" column="chunk_content"/>
+        <result property="title" column="chunk_title"/>
+        <result property="createAt" column="create_at"/>
+        <result property="updateAt" column="update_at"/>
+        <result property="isDeleted" column="is_deleted"/>
     </resultMap>
 
     <select id="searchByKeywords" parameterType="map" resultMap="kbFileChunkResultMap">

@@ -18,4 +18,5 @@ class ClassificationNotifier
 }
 
 final classificationProvider = AutoDisposeAsyncNotifierProvider<
-    ClassificationNotifier, ClassificationState>(ClassificationNotifier.new);
+    ClassificationNotifier,
+    ClassificationState>(ClassificationNotifier.new);

@@ -21,6 +21,7 @@ class SidebarItem {
 
 class SidebarItemWidget extends ConsumerWidget {
   const SidebarItemWidget({super.key, required this.item});
+
   final SidebarItem item;
 
   @override
@@ -35,7 +36,7 @@ class SidebarItemWidget extends ConsumerWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4),
             color:
-                selectedIndex == item.index ? Colors.grey[200] : Colors.white,
+            selectedIndex == item.index ? Colors.grey[200] : Colors.white,
           ),
           width: 30,
           height: 30,

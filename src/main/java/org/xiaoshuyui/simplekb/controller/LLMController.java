@@ -155,7 +155,7 @@ public class LLMController {
             var result = llmService.chat(prompt);
 
             // 更新响应内容和阶段
-            response.setStage("问题改写完成。\n"+result);
+            response.setStage("问题改写完成。\n" + result);
             SseUtil.sseSend(emitter, response);
 
             // 更新阶段信息，开始关键字检索
@@ -225,11 +225,11 @@ public class LLMController {
                         log.info("complete===> \n" + sb);
                     })
                     .subscribe(value -> {
-                        sb.append(value);
-                        response.setContent(value);
-                        SseUtil.sseSend(emitter, response);
-                    }, emitter::completeWithError,
-                    emitter::complete);
+                                sb.append(value);
+                                response.setContent(value);
+                                SseUtil.sseSend(emitter, response);
+                            }, emitter::completeWithError,
+                            emitter::complete);
 
             // 错误处理，如果发生异常且订阅未取消，则取消订阅
             emitter.onError((e) -> {

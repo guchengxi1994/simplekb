@@ -4,11 +4,11 @@
 
     <resultMap id="FileWithChunksResultMap" type="org.xiaoshuyui.simplekb.entity.response.FileWithChunks">
         <!-- Map file name -->
-        <result property="name" column="kb_file_name" />
+        <result property="name" column="kb_file_name"/>
         <!-- Map file type name -->
-        <result property="type" column="type_name" />
+        <result property="type" column="type_name"/>
         <!-- Map the number of chunks -->
-        <result property="chunkCount" column="chunk_count" />
+        <result property="chunkCount" column="chunk_count"/>
         <!-- Map the list of chunks -->
         <collection property="chunks" ofType="java.lang.String">
             <result column="chunk_content"/>
@@ -17,24 +17,23 @@
 
     <select id="getFileWithChunks" resultMap="FileWithChunksResultMap">
         SELECT
-            f.kb_file_name,
-            t.type_name,
-            COUNT(c.chunk_id) AS chunk_count,
-            c.chunk_content
+        f.kb_file_name,
+        t.type_name,
+        COUNT(c.chunk_id) AS chunk_count,
+        c.chunk_content
         FROM kb_file f
-                 LEFT JOIN kb_file_chunk c ON f.kb_file_id = c.file_id
-                 LEFT JOIN kb_file_type t ON f.kb_file_type = t.type_id
+        LEFT JOIN kb_file_chunk c ON f.kb_file_id = c.file_id
+        LEFT JOIN kb_file_type t ON f.kb_file_type = t.type_id
         WHERE f.is_deleted = 0
-          AND c.is_deleted = 0
-            <if test="chunkIds != null and chunkIds.size() > 0">
-                AND c.chunk_id IN
-                <foreach item="id" collection="chunkIds" open="(" separator="," close=")">
-                    #{id}
-                </foreach>
-            </if>
+        AND c.is_deleted = 0
+        <if test="chunkIds != null and chunkIds.size() > 0">
+            AND c.chunk_id IN
+            <foreach item="id" collection="chunkIds" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
         GROUP BY f.kb_file_id, c.chunk_id
     </select>
-
 
 
     <resultMap id="ChunkWithKeywordsResultMap" type="org.xiaoshuyui.simplekb.entity.response.ChunkWithKeywords">
@@ -49,18 +48,19 @@
         <id column="fileId" property="fileId"/>
         <result column="name" property="name"/>
         <result column="type" property="type"/>
-        <collection property="chunks" ofType="org.xiaoshuyui.simplekb.entity.response.ChunkWithKeywords" resultMap="ChunkWithKeywordsResultMap"/>
+        <collection property="chunks" ofType="org.xiaoshuyui.simplekb.entity.response.ChunkWithKeywords"
+                    resultMap="ChunkWithKeywordsResultMap"/>
     </resultMap>
 
 
     <select id="getFileWithKeywordsById" resultMap="FileWithKeywordsResultMap">
-        SELECT
-            f.kb_file_id AS fileId,
-            f.kb_file_name AS name,
-            ft.type_name AS type,
-            fc.chunk_id AS chunkId,
-            fc.chunk_content AS content,
-            kfck.keyword
+        SELECT f.kb_file_id     AS fileId,
+               f.kb_file_name   AS name,
+               ft.type_name     AS type,
+               fc.chunk_id      AS chunkId,
+               fc.chunk_content AS content,
+               fc.chunk_title   AS title,
+               kfck.keyword
         FROM kb_file f
                  LEFT JOIN kb_file_chunk fc ON f.kb_file_id = fc.file_id
                  LEFT JOIN kb_file_chunk_keywords kfck ON fc.chunk_id = kfck.chunk_id
@@ -69,20 +69,14 @@
     </select>
 
 
-    <select id="getFileWithKeywordsByType"
-            resultMap="FileWithKeywordsResultMap">
-        SELECT f_paged.*,
-               ft.type_name     AS type,
-               fc.chunk_id      AS chunkId,
-               fc.chunk_content AS content,
-               kfck.keyword
-        FROM (SELECT f.kb_file_id as fileId, f.kb_file_name as name, f.kb_file_type
-              FROM kb_file f
-                       LEFT JOIN kb_file_type ft ON f.kb_file_type = ft.type_id
-              WHERE ft.type_name = #{type} LIMIT #{pageId}
-                  , #{pageSize}) AS f_paged
-                 LEFT JOIN kb_file_chunk fc ON f_paged.kb_file_id = fc.file_id
-                 LEFT JOIN kb_file_chunk_keywords kfck ON fc.chunk_id = kfck.chunk_id
-                 LEFT JOIN kb_file_type ft ON f_paged.kb_file_type = ft.type_id
-    </select>
+    <resultMap id="kbFileMap" type="org.xiaoshuyui.simplekb.entity.KbFile">
+        <id column="kb_file_id" property="id"/>
+        <result column="kb_file_name" property="name"/>
+        <result column="type" property="typeName"/>
+        <collection property="chunks" ofType="org.xiaoshuyui.simplekb.entity.KbFileChunk">
+            <id column="chunk_id" property="id"/>
+            <result column="chunk_content" property="content"/>
+            <result column="chunk_title" property="title"/>
+        </collection>
+    </resultMap>
 </mapper>

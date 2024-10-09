@@ -1,5 +1,6 @@
 class ClassificationState {
   List<ClassificationTreeNode> nodes;
+
   ClassificationState({required this.nodes});
 
   ClassificationState copyWith({

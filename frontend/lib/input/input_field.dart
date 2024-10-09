@@ -6,6 +6,7 @@ typedef OnSubmit = void Function(String);
 
 class InputField extends StatefulWidget {
   const InputField({super.key, required this.onSubmit});
+
   final OnSubmit onSubmit;
 
   @override
@@ -17,10 +18,11 @@ class _InputFieldState extends State<InputField> {
     onKeyEvent: (node, event) {
       if (event.physicalKey == PhysicalKeyboardKey.enter &&
           !HardwareKeyboard.instance.physicalKeysPressed.any(
-            (el) => <PhysicalKeyboardKey>{
-              PhysicalKeyboardKey.shiftLeft,
-              PhysicalKeyboardKey.shiftRight,
-            }.contains(el),
+                (el) =>
+                <PhysicalKeyboardKey>{
+                  PhysicalKeyboardKey.shiftLeft,
+                  PhysicalKeyboardKey.shiftRight,
+                }.contains(el),
           )) {
         if (event is KeyDownEvent) {
           _handleSendPressed();
@@ -75,15 +77,15 @@ class _InputFieldState extends State<InputField> {
                     decoration: InputDecoration(
                         hintText: "请输入对话内容",
                         hintStyle:
-                            TextStyle(fontSize: 14, color: Styles.black515A6E),
+                        TextStyle(fontSize: 14, color: Styles.black515A6E),
                         contentPadding: const EdgeInsets.only(left: 16),
                         enabledBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: Styles.divider, width: 1),
+                            BorderSide(color: Styles.divider, width: 1),
                             borderRadius: BorderRadius.circular(10)),
                         focusedBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: Styles.blue247AF2, width: 1),
+                            BorderSide(color: Styles.blue247AF2, width: 1),
                             borderRadius: BorderRadius.circular(10)),
                         suffixIcon: FittedBox(
                           child: Row(

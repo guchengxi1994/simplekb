@@ -1,5 +1,8 @@
 package org.xiaoshuyui.simplekb.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.xiaoshuyui.simplekb.entity.KbFile;
@@ -30,7 +33,16 @@ public class KbFileService {
         return kbFileMapper.getFileWithKeywordsById(fileId);
     }
 
-    public List<FileWithKeywords> getFileWithKeywordsByType(String type, int pageId, int pageSize) {
-        return kbFileMapper.getFileWithKeywordsByType(type, pageId, pageSize);
+    public List<KbFile> getFileWithKeywordsByType(Long type, int pageId, int pageSize) {
+        Page<KbFile> page = new Page<>(pageId, pageSize);
+        IPage<KbFile> parentPage = kbFileMapper.selectPage(page, new QueryWrapper<KbFile>().eq("kb_file_type", type));
+
+        parentPage.getRecords().forEach(parent -> {
+            FileWithKeywords fullParent = kbFileMapper.getFileWithKeywordsById(parent.getId());
+            parent.setChunks(fullParent.toKbFileChunks());
+            parent.setTypeName(fullParent.getType());
+        });
+
+        return parentPage.getRecords();
     }
 }

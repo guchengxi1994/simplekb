@@ -45,7 +45,7 @@ public class FileController {
     }
 
     @GetMapping("/file-with-keywords-by-type")
-    public Result getFileWithKeywordsByType(@Param("type") String type) {
+    public Result getFileWithKeywordsByType(@Param("type") Long type) {
         return Result.OK_data(kbFileService.getFileWithKeywordsByType(type, 1, 2));
     }
 }

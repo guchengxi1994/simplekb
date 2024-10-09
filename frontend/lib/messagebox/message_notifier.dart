@@ -25,7 +25,8 @@ class MessageNotifier extends AutoDisposeNotifier<MessageState> {
       return;
     }
 
-    final l = List<MessageBox>.from(state.messageBox)..add(box);
+    final l = List<MessageBox>.from(state.messageBox)
+      ..add(box);
 
     state = MessageState(
         messageBox: l,
@@ -46,11 +47,12 @@ class MessageNotifier extends AutoDisposeNotifier<MessageState> {
   updateMessageBox(ChatResponse response) {
     final box = state.messageBox
         .where((element) =>
-            element is ResponseMessageBox && element.id == response.uuid)
+    element is ResponseMessageBox && element.id == response.uuid)
         .firstOrNull;
 
     if (box != null) {
-      final l = List<MessageBox>.from(state.messageBox)..remove(box);
+      final l = List<MessageBox>.from(state.messageBox)
+        ..remove(box);
       box.content += response.content ?? "";
       if (box is ResponseMessageBox) {
         box.stage = response.stage ?? "";
@@ -85,29 +87,29 @@ class MessageNotifier extends AutoDisposeNotifier<MessageState> {
     }
   }
 
-  // refresh(List<HistoryMessages> messages) {
-  //   if (state.isLoading) {
-  //     return;
-  //   }
+// refresh(List<HistoryMessages> messages) {
+//   if (state.isLoading) {
+//     return;
+//   }
 
-  //   List<MessageBox> boxes = [];
-  //   for (final i in messages) {
-  //     if (i.messageType == MessageType.query) {
-  //       boxes.add(RequestMessageBox(content: i.content ?? ""));
-  //     } else {
-  //       boxes.add(ResponseMessageBox(
-  //           content: i.content ?? "", id: "history_${i.id}"));
-  //     }
-  //   }
+//   List<MessageBox> boxes = [];
+//   for (final i in messages) {
+//     if (i.messageType == MessageType.query) {
+//       boxes.add(RequestMessageBox(content: i.content ?? ""));
+//     } else {
+//       boxes.add(ResponseMessageBox(
+//           content: i.content ?? "", id: "history_${i.id}"));
+//     }
+//   }
 
-  //   state = MessageState(
-  //       messageBox: boxes,
-  //       isLoading: false,
-  //       isKnowledgeBaseChat: state.isKnowledgeBaseChat);
-  // }
+//   state = MessageState(
+//       messageBox: boxes,
+//       isLoading: false,
+//       isKnowledgeBaseChat: state.isKnowledgeBaseChat);
+// }
 }
 
 final messageProvider =
-    AutoDisposeNotifierProvider<MessageNotifier, MessageState>(
-  () => MessageNotifier(),
+AutoDisposeNotifierProvider<MessageNotifier, MessageState>(
+      () => MessageNotifier(),
 );

@@ -18,4 +18,4 @@ class SidebarNotifier extends AutoDisposeNotifier<int> {
 }
 
 final sidebarProvider =
-    AutoDisposeNotifierProvider<SidebarNotifier, int>(SidebarNotifier.new);
+AutoDisposeNotifierProvider<SidebarNotifier, int>(SidebarNotifier.new);

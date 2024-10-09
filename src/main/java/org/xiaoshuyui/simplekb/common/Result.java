@@ -33,6 +33,7 @@ public class Result<T> implements Serializable {
     /**
      * 返回数据对象 data
      */
+    @Deprecated(since = "use `data` instead")
     @Schema(name = "result")
     private T result;
 

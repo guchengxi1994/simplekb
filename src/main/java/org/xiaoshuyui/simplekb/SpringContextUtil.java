@@ -9,12 +9,12 @@ import org.springframework.stereotype.Component;
 public class SpringContextUtil implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
+    public static <T> T getBean(Class<T> clazz) {
+        return applicationContext.getBean(clazz);
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         SpringContextUtil.applicationContext = applicationContext;
-    }
-
-    public static <T> T getBean(Class<T> clazz) {
-        return applicationContext.getBean(clazz);
     }
 }

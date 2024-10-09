@@ -8,6 +8,7 @@ import 'classification_notifier.dart';
 
 class ClassificationScreen extends ConsumerWidget {
   const ClassificationScreen({super.key});
+
   static Random random = Random();
 
   @override
@@ -18,8 +19,14 @@ class ClassificationScreen extends ConsumerWidget {
         data: (v) {
           return Container(
             padding: EdgeInsets.all(20),
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
+            width: MediaQuery
+                .of(context)
+                .size
+                .width,
+            height: MediaQuery
+                .of(context)
+                .size
+                .height,
             child: TreeMapLayout(
               duration: Duration(milliseconds: 500),
               tile: Squarify(),
@@ -27,7 +34,8 @@ class ClassificationScreen extends ConsumerWidget {
                 TreeNode.node(
                     children: v.nodes
                         .map(
-                          (n) => TreeNode.leaf(
+                          (n) =>
+                          TreeNode.leaf(
                             margin: EdgeInsets.all(5),
                             options: TreeNodeOptions(
                                 child: Text(
@@ -36,10 +44,10 @@ class ClassificationScreen extends ConsumerWidget {
                                 ),
                                 onTap: () {},
                                 color: Colors.primaries[
-                                    random.nextInt(Colors.primaries.length)]),
+                                random.nextInt(Colors.primaries.length)]),
                             value: n.count,
                           ),
-                        )
+                    )
                         .toList())
               ],
             ),

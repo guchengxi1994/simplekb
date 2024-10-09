@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @TableName("kb_file")
@@ -20,4 +21,9 @@ public class KbFile {
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
     private int isDeleted;
+
+    @TableField(value = "chunks", exist = false)
+    private List<KbFileChunk> chunks;
+    @TableField(value = "type", exist = false)
+    private String typeName;
 }

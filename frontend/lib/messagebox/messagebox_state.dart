@@ -5,8 +5,7 @@ class MessageState {
   bool isLoading = false;
   bool isKnowledgeBaseChat = false;
 
-  MessageState(
-      {this.messageBox = const [],
-      this.isLoading = false,
-      this.isKnowledgeBaseChat = false});
+  MessageState({this.messageBox = const [],
+    this.isLoading = false,
+    this.isKnowledgeBaseChat = false});
 }

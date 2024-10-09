@@ -22,11 +22,10 @@ class BaseModel<T> {
     @Deprecated("use data instead") this.result,
   });
 
-  factory BaseModel.fromJson(
-    Map<String, dynamic> json,
-    T Function(Object? json) fromJsonT,
-  ) =>
+  factory BaseModel.fromJson(Map<String, dynamic> json,
+      T Function(Object? json) fromJsonT,) =>
       _$BaseModelFromJson(json, fromJsonT);
+
   Map<String, dynamic> toJson(Object Function(T value) toJsonT) =>
       _$BaseModelToJson(this, toJsonT);
 }

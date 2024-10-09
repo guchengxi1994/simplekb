@@ -29,14 +29,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       children: [
         Flexible(
             child: SizedBox.expand(
-          child: SingleChildScrollView(
-            controller: ref.read(messageProvider.notifier).scrollController,
-            padding: const EdgeInsets.only(left: 20, right: 20),
-            child: Column(
-              children: state.messageBox.map((e) => e.toWidget()).toList(),
-            ),
-          ),
-        )),
+              child: SingleChildScrollView(
+                controller: ref
+                    .read(messageProvider.notifier)
+                    .scrollController,
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                child: Column(
+                  children: state.messageBox.map((e) => e.toWidget()).toList(),
+                ),
+              ),
+            )),
         InputField(onSubmit: (s) => _handleInputMessage(s, state))
       ],
     );

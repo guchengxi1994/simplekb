@@ -22,12 +22,14 @@ class _AppState extends ConsumerState<App> {
           const Sidebar(),
           Expanded(
               child: PageView(
-            controller: ref.read(sidebarProvider.notifier).pageController,
-            children: [
-              ChatScreen(),
-              ClassificationScreen(),
-            ],
-          ))
+                controller: ref
+                    .read(sidebarProvider.notifier)
+                    .pageController,
+                children: [
+                  ChatScreen(),
+                  ClassificationScreen(),
+                ],
+              ))
         ],
       ),
     );
