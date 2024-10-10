@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<workflow>
+    <step id="1" name="Start">
+        <action class="org.xiaoshuyui.simplekb.workflow.StartAction"/>
+        <next step="2"/>
+    </step>
+    <step id="2" name="CheckCondition">
+        <condition class="org.xiaoshuyui.simplekb.workflow.ConditionChecker"/>
+        <true-step step="3"/>
+        <false-step step="4"/>
+    </step>
+    <step id="3" name="DoTaskA">
+        <action class="org.xiaoshuyui.simplekb.workflow.TaskA"/>
+        <next step="5"/>
+    </step>
+    <step id="4" name="DoTaskB">
+        <action class="org.xiaoshuyui.simplekb.workflow.TaskB"/>
+        <next step="5"/>
+    </step>
+    <step id="5" name="End">
+        <action class="org.xiaoshuyui.simplekb.workflow.EndAction"/>
+    </step>
+</workflow>

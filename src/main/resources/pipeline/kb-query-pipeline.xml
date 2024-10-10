@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pipeline>
+    <step id="1" name="question-rewrite" key="{question}">
+        <action class="org.xiaoshuyui.simplekb.pipeline.PQuestionRewrite"/>
+        <next step="2"/>
+    </step>
+    <step id="2" name="question-rewrite" key="{question}">
+        <action class="org.xiaoshuyui.simplekb.pipeline.PKeywordsSearch"/>
+        <next step="3"/>
+    </step>
+    <step id="3" name="end-action" key="1">
+        <action class="org.xiaoshuyui.simplekb.pipeline.PEndAction"/>
+    </step>
+</pipeline>

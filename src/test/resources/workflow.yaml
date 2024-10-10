@@ -1,0 +1,7 @@
+workflow:
+  - className: "org.xiaoshuyui.simplekb.MyClass"
+    fieldName: "status"
+    methods:
+      value1: "methodA"
+      value2: "methodB"
+      default: "methodDefault"
