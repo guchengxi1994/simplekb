@@ -47,7 +47,6 @@ Map<String, dynamic> _$FileToJson(File instance) => <String, dynamic>{
 Chunk _$ChunkFromJson(Map<String, dynamic> json) => Chunk(
       id: (json['id'] as num).toInt(),
       content: json['content'] as String,
-      title: json['title'] as String?,
       keywords:
           (json['keywords'] as List<dynamic>).map((e) => e as String).toList(),
     );
@@ -55,6 +54,5 @@ Chunk _$ChunkFromJson(Map<String, dynamic> json) => Chunk(
 Map<String, dynamic> _$ChunkToJson(Chunk instance) => <String, dynamic>{
       'id': instance.id,
       'content': instance.content,
-      'title': instance.title,
       'keywords': instance.keywords,
     };

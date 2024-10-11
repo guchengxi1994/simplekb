@@ -45,7 +45,6 @@ CREATE TABLE `kb_file_chunk`
     `create_at`     datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_at`     datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `is_deleted`    tinyint(1) NULL DEFAULT 0 COMMENT '是否被删除',
-    `chunk_title`   text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '标题，可以为空',
     PRIMARY KEY (`chunk_id`) USING BTREE,
     FULLTEXT        INDEX `idx_content`(`chunk_content`) WITH PARSER `ngram`
 ) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;

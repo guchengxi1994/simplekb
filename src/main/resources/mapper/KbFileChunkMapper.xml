@@ -6,7 +6,6 @@
         <id property="id" column="chunk_id"/>
         <result property="fileId" column="file_id"/>
         <result property="content" column="chunk_content"/>
-        <result property="title" column="chunk_title"/>
         <result property="createAt" column="create_at"/>
         <result property="updateAt" column="update_at"/>
         <result property="isDeleted" column="is_deleted"/>

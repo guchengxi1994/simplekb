@@ -18,8 +18,7 @@ public class PromptController {
     private KbPromptService promptService;
 
     @GetMapping("/query")
-    public Result queryAllPrompts()
-    {
+    public Result queryAllPrompts() {
         return Result.OK_data(promptService.getPrompts());
     }
 }

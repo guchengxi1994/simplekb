@@ -115,7 +115,7 @@ class ClassificationDetailsScreen extends ConsumerWidget {
                           Expanded(
                               flex: 7,
                               child: Text(
-                                "${c.title ?? ""}  ${c.content.replaceAll("\n", "🤏🏻")}",
+                                c.content.replaceAll("\n", "🤏🏻"),
                                 maxLines: 1,
                                 softWrap: true,
                                 overflow: TextOverflow.ellipsis,

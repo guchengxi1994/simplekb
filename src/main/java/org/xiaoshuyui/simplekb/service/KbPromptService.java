@@ -13,13 +13,13 @@ public class KbPromptService {
 
     List<KbPrompt> prompts = null;
 
-    public List<KbPrompt> getPrompts() {
-        return prompts;
-    }
-
     KbPromptService(KbPromptMapper kbPromptMapper) {
         this.kbPromptMapper = kbPromptMapper;
         prompts = kbPromptMapper.getAllPrompt();
+    }
+
+    public List<KbPrompt> getPrompts() {
+        return prompts;
     }
 
     public String getByName(String name) {

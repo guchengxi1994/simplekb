@@ -30,7 +30,6 @@ class ChunkWithKeywords {
         kbFileChunk.setContent(content);
         kbFileChunk.setId(chunkId);
         kbFileChunk.setKeywords(keywords);
-        kbFileChunk.setTitle(title);
         return kbFileChunk;
     }
 }

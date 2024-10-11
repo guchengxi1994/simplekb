@@ -26,7 +26,7 @@ public class Pipeline {
         while (currentStepId != null) {
             if (context.containsKey("error")) {
                 System.out.println("Error detected, stopping pipeline execution.");
-                throw new PipelineException(""+context.get("error"));
+                throw new PipelineException("" + context.get("error"));
             }
             Step step = steps.get(currentStepId);
             if (step == null) {
@@ -43,7 +43,7 @@ public class Pipeline {
             log.info("Executing step " + currentStepId);
             if (context.containsKey("error")) {
                 log.error("Error detected, stopping pipeline execution.");
-                throw new PipelineException(""+context.get("error"));
+                throw new PipelineException("" + context.get("error"));
             }
             if (onExecute != null) {
                 if (context.containsKey("step")) {

@@ -59,7 +59,6 @@
                ft.type_name     AS type,
                fc.chunk_id      AS chunkId,
                fc.chunk_content AS content,
-               fc.chunk_title   AS title,
                kfck.keyword
         FROM kb_file f
                  LEFT JOIN kb_file_chunk fc ON f.kb_file_id = fc.file_id
@@ -76,7 +75,6 @@
         <collection property="chunks" ofType="org.xiaoshuyui.simplekb.entity.KbFileChunk">
             <id column="chunk_id" property="id"/>
             <result column="chunk_content" property="content"/>
-            <result column="chunk_title" property="title"/>
         </collection>
     </resultMap>
 </mapper>

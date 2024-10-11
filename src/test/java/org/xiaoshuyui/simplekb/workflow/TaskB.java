@@ -1,6 +1,6 @@
 package org.xiaoshuyui.simplekb.workflow;
 
-public class TaskB implements Action{
+public class TaskB implements Action {
 
     @Override
     public Object execute(Object obj) {

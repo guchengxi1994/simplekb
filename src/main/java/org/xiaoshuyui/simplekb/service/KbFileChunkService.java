@@ -23,12 +23,12 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
 
     public List<KbFileChunk> fullTextSearch(List<String> keywords) {
         Map<String, String> params = new HashMap<>();
-        StringBuffer keyword = new StringBuffer("");
+        StringBuilder keyword = new StringBuilder();
         for (int i = 0; i < keywords.size(); i++) {
             if (i == keywords.size() - 1) {
                 keyword.append(keywords.get(i));
             } else {
-                keyword.append(keywords.get(i) + " | ");
+                keyword.append(keywords.get(i)).append(" | ");
             }
         }
         params.put("keywords", keyword.toString());
@@ -41,10 +41,8 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
         for (Section content : contents) {
             KbFileChunk chunk = new KbFileChunk();
             chunk.setFileId(fileId);
-            chunk.setTitle(content.getTitle());
-            chunk.setContent(content.getContent());
+            chunk.setContent(content.toString());
             chunks.add(chunk);
-
         }
 
         this.saveBatch(chunks, 100);

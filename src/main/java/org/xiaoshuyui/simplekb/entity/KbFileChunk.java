@@ -22,9 +22,6 @@ public class KbFileChunk {
     @TableField("chunk_content")
     private String content;
 
-    @TableField("chunk_title")
-    private String title;
-
     @JsonIgnore
     private LocalDateTime createAt;
     @JsonIgnore

@@ -119,7 +119,7 @@ public class PQuestionRewriteEngineController {
                 log.error(e.getMessage());
                 SseUtil.sseSend(emitter, e.getMessage());
                 emitter.complete();
-            } catch (Exception e){
+            } catch (Exception e) {
                 log.error(e.getMessage());
                 SseUtil.sseSend(emitter, "流水线内部错误");
                 emitter.complete();

@@ -31,8 +31,7 @@
         f.kb_file_name AS name,
         ft.type_name AS type,
         fc.chunk_id AS chunkId,
-        fc.chunk_content AS content,
-        fc.chunk_title AS title,
+        fc.chunk_content AS content
         kfck.keyword
         FROM kb_file f
         LEFT JOIN kb_file_chunk fc ON f.kb_file_id = fc.file_id

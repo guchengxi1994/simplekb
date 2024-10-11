@@ -49,13 +49,11 @@ class File {
 class Chunk {
   final int id;
   final String content;
-  final String? title;
   final List<String> keywords;
 
   Chunk({
     required this.id,
     required this.content,
-    this.title,
     required this.keywords,
   });
 
