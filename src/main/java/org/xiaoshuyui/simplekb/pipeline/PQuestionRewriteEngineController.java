@@ -115,9 +115,13 @@ public class PQuestionRewriteEngineController {
                 pipeline.execute(context, (String msg) -> SseUtil.sseSend(emitter, msg));
                 SseUtil.sseSend(emitter, pipeline.output);
                 emitter.complete();
-            } catch (Exception e) {
-                System.out.println(e);
+            } catch (PipelineException e) {
+                log.error(e.getMessage());
                 SseUtil.sseSend(emitter, e.getMessage());
+                emitter.complete();
+            } catch (Exception e){
+                log.error(e.getMessage());
+                SseUtil.sseSend(emitter, "流水线内部错误");
                 emitter.complete();
             }
         });
