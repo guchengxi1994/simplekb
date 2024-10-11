@@ -19,60 +19,70 @@ class DatatableIndicator extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(classificationDetailsProvider(arg)).value!.pageId;
+    final state = ref.watch(classificationDetailsProvider(arg)).value!;
     _list = ["上一页", state, "下一页"];
 
-    return Wrap(
-      spacing: 5,
-      children: _list.mapIndexed((index, element) {
-        if (index == 0) {
-          return GestureDetector(
-            onTap: () {
-              ref.read(classificationDetailsProvider(arg).notifier).prevPage();
-            },
-            child: Container(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Wrap(
+          spacing: 5,
+          children: _list.mapIndexed((index, element) {
+            if (index == 0) {
+              return GestureDetector(
+                onTap: () {
+                  ref
+                      .read(classificationDetailsProvider(arg).notifier)
+                      .prevPage();
+                },
+                child: Container(
+                  width: size,
+                  height: size,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                          color: const Color.fromARGB(255, 230, 223, 223)),
+                      borderRadius: const BorderRadius.all(Radius.circular(4)),
+                      color: Colors.white),
+                  child: const Icon(Icons.chevron_left),
+                ),
+              );
+            }
+            if (index == _list.length - 1) {
+              return GestureDetector(
+                  onTap: () {
+                    ref
+                        .read(classificationDetailsProvider(arg).notifier)
+                        .nextPage();
+                  },
+                  child: Container(
+                    width: size,
+                    height: size,
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            color: const Color.fromARGB(255, 230, 223, 223)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(4)),
+                        color: Colors.white),
+                    child: const Icon(Icons.chevron_right),
+                  ));
+            }
+            return Container(
               width: size,
               height: size,
               decoration: BoxDecoration(
                   border: Border.all(
                       color: const Color.fromARGB(255, 230, 223, 223)),
                   borderRadius: const BorderRadius.all(Radius.circular(4)),
-                  color: Colors.white),
-              child: const Icon(Icons.chevron_left),
-            ),
-          );
-        }
-        if (index == _list.length - 1) {
-          return GestureDetector(
-              onTap: () {
-                ref
-                    .read(classificationDetailsProvider(arg).notifier)
-                    .nextPage();
-              },
-              child: Container(
-                width: size,
-                height: size,
-                decoration: BoxDecoration(
-                    border: Border.all(
-                        color: const Color.fromARGB(255, 230, 223, 223)),
-                    borderRadius: const BorderRadius.all(Radius.circular(4)),
-                    color: Colors.white),
-                child: const Icon(Icons.chevron_right),
-              ));
-        }
-        return Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(
-              border:
-                  Border.all(color: const Color.fromARGB(255, 230, 223, 223)),
-              borderRadius: const BorderRadius.all(Radius.circular(4)),
-              color: Colors.blue),
-          child: Center(
-            child: Text(state.toString()),
-          ),
-        );
-      }).toList(),
+                  color: Colors.blue),
+              child: Center(
+                child: Text(state.pageId.toString()),
+              ),
+            );
+          }).toList(),
+        ),
+        const SizedBox(width: 20),
+        Text("总共${state.fileList.total}条数据")
+      ],
     );
   }
 }

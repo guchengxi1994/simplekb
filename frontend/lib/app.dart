@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/chat_screen.dart';
+import 'package:frontend/prompt_management/prompt_management_screen.dart';
 
 import 'classification/classification_screen.dart';
 import 'sidebar/sidebar.dart';
@@ -22,14 +23,13 @@ class _AppState extends ConsumerState<App> {
           const Sidebar(),
           Expanded(
               child: PageView(
-                controller: ref
-                    .read(sidebarProvider.notifier)
-                    .pageController,
-                children: [
-                  ChatScreen(),
-                  ClassificationScreen(),
-                ],
-              ))
+            controller: ref.read(sidebarProvider.notifier).pageController,
+            children: [
+              ChatScreen(),
+              ClassificationScreen(),
+              PromptManagementScreen()
+            ],
+          ))
         ],
       ),
     );

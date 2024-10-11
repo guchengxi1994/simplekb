@@ -7,7 +7,7 @@ import org.xiaoshuyui.simplekb.mapper.KbFileChunkKeywordsMapper;
 
 @Aspect
 @Component
-public class GlobalKeywordsChangeAspect {
+public class GlobalChangeAspect {
 
     @After("execution(* org.xiaoshuyui.simplekb.mapper.KbFileChunkKeywordsMapper.delete(..)) || execution(* org.xiaoshuyui.simplekb.mapper.KbFileChunkKeywordsMapper.insert(..))")
     public void afterKeywordsChange() {

@@ -29,7 +29,17 @@ class Sidebar extends ConsumerWidget {
           onClick: (v) {
             ref.read(sidebarProvider.notifier).setIndex(v);
           },
-          index: 1)
+          index: 1),
+      SidebarItem(
+          icon: const Icon(
+            Icons.text_fields,
+            color: Colors.blueAccent,
+          ),
+          iconInactive: const Icon(Icons.text_fields),
+          onClick: (v) {
+            ref.read(sidebarProvider.notifier).setIndex(v);
+          },
+          index: 2)
     ];
 
     return Padding(
