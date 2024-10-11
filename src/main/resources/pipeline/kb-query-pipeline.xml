@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<pipeline>
-    <step id="1" name="question-rewrite" key="{question}">
-        <action class="org.xiaoshuyui.simplekb.pipeline.PQuestionRewrite"/>
+<pipeline result="org.xiaoshuyui.simplekb.pipeline.output.KbQueryOutput">
+    <step id="1" name="start-action" key="">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PStartAction"/>
         <next step="2"/>
     </step>
     <step id="2" name="question-rewrite" key="{question}">
-        <action class="org.xiaoshuyui.simplekb.pipeline.PKeywordsSearch"/>
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PQuestionRewrite"/>
         <next step="3"/>
     </step>
-    <step id="3" name="end-action" key="1">
-        <action class="org.xiaoshuyui.simplekb.pipeline.PEndAction"/>
+    <step id="3" name="keyword-search" key="{question}">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PKeywordsSearch"/>
+        <next step="4"/>
+    </step>
+    <step id="4" name="end-action" key="1">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PEndAction"/>
     </step>
 </pipeline>

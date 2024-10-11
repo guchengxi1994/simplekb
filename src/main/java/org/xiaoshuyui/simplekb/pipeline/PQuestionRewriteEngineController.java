@@ -7,18 +7,25 @@ import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xiaoshuyui.simplekb.SpringContextUtil;
 import org.xiaoshuyui.simplekb.common.Result;
+import org.xiaoshuyui.simplekb.common.SseUtil;
+import org.xiaoshuyui.simplekb.pipeline.actions.Action;
+import org.xiaoshuyui.simplekb.pipeline.actions.PEndAction;
+import org.xiaoshuyui.simplekb.pipeline.actions.PKeywordsSearch;
+import org.xiaoshuyui.simplekb.pipeline.actions.PQuestionRewrite;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 @Deprecated(since = "for test")
 @RestController
@@ -89,5 +96,31 @@ public class PQuestionRewriteEngineController {
                 break;
             }
         }
+    }
+
+
+    @GetMapping("/rewrite2")
+    public SseEmitter rewrite2(@Param("question") String question) {
+        SseEmitter emitter = new SseEmitter();
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+            SseUtil.sseSend(emitter, "start");
+
+            log.info("Received question: " + question);
+            try {
+                Pipeline pipeline = PipelineParser.parse(xmlResource.getInputStream());
+                Map<String, Object> context = new HashMap<>();
+                context.put("{question}", question);
+                context.put("output", pipeline.output);
+                pipeline.execute(context, (String msg) -> SseUtil.sseSend(emitter, msg));
+                SseUtil.sseSend(emitter, pipeline.output);
+                emitter.complete();
+            } catch (Exception e) {
+                System.out.println(e);
+                SseUtil.sseSend(emitter, e.getMessage());
+                emitter.complete();
+            }
+        });
+        return emitter;
     }
 }

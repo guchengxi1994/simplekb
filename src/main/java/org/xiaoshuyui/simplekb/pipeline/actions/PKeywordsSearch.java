@@ -1,29 +1,31 @@
-package org.xiaoshuyui.simplekb.pipeline;
+package org.xiaoshuyui.simplekb.pipeline.actions;
 
 import io.qdrant.client.grpc.Points;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.xiaoshuyui.simplekb.AppConfig;
+import org.xiaoshuyui.simplekb.SpringContextUtil;
 import org.xiaoshuyui.simplekb.common.HanlpUtils;
+import org.xiaoshuyui.simplekb.pipeline.output.KbQueryOutput;
 import org.xiaoshuyui.simplekb.service.KbFileChunkService;
 import org.xiaoshuyui.simplekb.service.QdrantService;
 
 import java.util.List;
 import java.util.Map;
 
-@Component
 @Slf4j
 public class PKeywordsSearch implements Action {
 
-    @Resource
-    private KbFileChunkService kbFileChunkService;
+    private final KbFileChunkService kbFileChunkService;
 
-    @Resource
-    private QdrantService qdrantService;
+    private final QdrantService qdrantService;
 
-    @Value("${chunk.top-k}")
-    private int topK;
+    private final int topK;
+
+    public PKeywordsSearch() {
+        this.topK = SpringContextUtil.getBean(AppConfig.class).topK();
+        this.kbFileChunkService = SpringContextUtil.getBean(KbFileChunkService.class);
+        this.qdrantService = SpringContextUtil.getBean(QdrantService.class);
+    }
 
     public void execute(Map<String, Object> obj, String key, String stepId) {
         String val = obj.get(key).toString();
@@ -32,6 +34,7 @@ public class PKeywordsSearch implements Action {
         var chunkIds = kbFileChunkService.fullTextSearch(keywords).stream().map(x -> x.getId()).toList();
         if (chunkIds.isEmpty()) {
             obj.put(stepId, null);
+            obj.put("error", "关键字检索异常");
             return;
         }
 
@@ -41,11 +44,16 @@ public class PKeywordsSearch implements Action {
             result2 = qdrantService.searchVector(qdrantService.getEmbedding(val), topK, chunkIds);
         } catch (Exception e) {
             obj.put(stepId, null);
+            obj.put("error", "相似度检索异常");
             return;
         }
 
         List<Long> chunkIds2 = result2.stream().map(x -> x.getId().getNum()).toList();
 
         obj.put(stepId, chunkIds2);
+        obj.put("step", "关键字检索完成。正在执行下一步...");
+
+        KbQueryOutput output = (KbQueryOutput) obj.get("output");
+        output.setIds(chunkIds2);
     }
 }
