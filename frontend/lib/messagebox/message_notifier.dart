@@ -11,13 +11,7 @@ class MessageNotifier extends AutoDisposeNotifier<MessageState> {
 
   @override
   MessageState build() {
-    return MessageState(isKnowledgeBaseChat: true);
-  }
-
-  changeKnowledgeBaseChat(bool b) {
-    if (state.isKnowledgeBaseChat != b) {
-      state = MessageState(isKnowledgeBaseChat: b);
-    }
+    return MessageState();
   }
 
   addMessageBox(MessageBox box) {
@@ -25,13 +19,12 @@ class MessageNotifier extends AutoDisposeNotifier<MessageState> {
       return;
     }
 
-    final l = List<MessageBox>.from(state.messageBox)
-      ..add(box);
+    final l = List<MessageBox>.from(state.messageBox)..add(box);
 
     state = MessageState(
-        messageBox: l,
-        isLoading: state.isLoading,
-        isKnowledgeBaseChat: state.isKnowledgeBaseChat);
+      messageBox: l,
+      isLoading: state.isLoading,
+    );
 
     scrollController.jumpTo(
       scrollController.position.maxScrollExtent,
@@ -47,20 +40,19 @@ class MessageNotifier extends AutoDisposeNotifier<MessageState> {
   updateMessageBox(ChatResponse response) {
     final box = state.messageBox
         .where((element) =>
-    element is ResponseMessageBox && element.id == response.uuid)
+            element is ResponseMessageBox && element.id == response.uuid)
         .firstOrNull;
 
     if (box != null) {
-      final l = List<MessageBox>.from(state.messageBox)
-        ..remove(box);
+      final l = List<MessageBox>.from(state.messageBox)..remove(box);
       box.content += response.content ?? "";
       if (box is ResponseMessageBox) {
         box.stage = response.stage ?? "";
       }
       state = MessageState(
-          messageBox: l..add(box),
-          isLoading: state.isLoading,
-          isKnowledgeBaseChat: state.isKnowledgeBaseChat);
+        messageBox: l..add(box),
+        isLoading: state.isLoading,
+      );
     } else {
       final l = List<MessageBox>.from(state.messageBox)
         ..add(ResponseMessageBox(
@@ -68,9 +60,9 @@ class MessageNotifier extends AutoDisposeNotifier<MessageState> {
             id: response.uuid!,
             stage: response.stage ?? ""));
       state = MessageState(
-          isLoading: state.isLoading,
-          messageBox: l,
-          isKnowledgeBaseChat: state.isKnowledgeBaseChat);
+        isLoading: state.isLoading,
+        messageBox: l,
+      );
     }
 
     scrollController.jumpTo(
@@ -81,9 +73,9 @@ class MessageNotifier extends AutoDisposeNotifier<MessageState> {
   setLoading(bool b) {
     if (b != state.isLoading) {
       state = MessageState(
-          messageBox: state.messageBox,
-          isLoading: b,
-          isKnowledgeBaseChat: state.isKnowledgeBaseChat);
+        messageBox: state.messageBox,
+        isLoading: b,
+      );
     }
   }
 
@@ -110,6 +102,6 @@ class MessageNotifier extends AutoDisposeNotifier<MessageState> {
 }
 
 final messageProvider =
-AutoDisposeNotifierProvider<MessageNotifier, MessageState>(
-      () => MessageNotifier(),
+    AutoDisposeNotifierProvider<MessageNotifier, MessageState>(
+  () => MessageNotifier(),
 );
