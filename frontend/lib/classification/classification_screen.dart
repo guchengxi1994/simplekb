@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/classification/classification_state.dart';
-import 'package:frontend/utils.dart';
 import 'package:treemap/treemap.dart';
 
 import 'classification_details_screen.dart';
@@ -63,12 +62,6 @@ class ClassificationScreen extends ConsumerWidget {
                                         style: TextStyle(color: Colors.white),
                                       ),
                                       onTap: () {
-                                        if (n.count == 0) {
-                                          ToastUtils.error(context,
-                                              title: "无数据");
-                                          return;
-                                        }
-
                                         Navigator.pushNamed(context, '/details',
                                             arguments: n.id);
                                       },

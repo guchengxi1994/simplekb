@@ -27,6 +27,7 @@ import java.util.concurrent.Executors;
 @RequestMapping("/llm")
 public class LLMController {
 
+
     @Resource
     KbPromptService kbPromptService;
 

@@ -13,6 +13,8 @@ environment:
 dependencies:
   data_table_2: ^2.5.15
   dio: ^5.7.0
+  dropdown_button2: ^2.3.9
+  file_selector: ^1.0.3
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.5.1

@@ -4,7 +4,7 @@ import 'package:toastification/toastification.dart';
 class ToastUtils {
   ToastUtils._();
 
-  static void sucess(BuildContext context,
+  static void sucess(BuildContext? context,
       {required String title, String? descryption, VoidCallback? onTap}) {
     toastification.show(
       context: context,
@@ -55,7 +55,7 @@ class ToastUtils {
     );
   }
 
-  static void error(BuildContext context,
+  static void error(BuildContext? context,
       {required String title, String? descryption, VoidCallback? onTap}) {
     toastification.show(
       context: context,

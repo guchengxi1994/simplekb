@@ -8,6 +8,10 @@ import java.util.regex.Pattern;
 public class TitlePatternManager {
     private List<Pattern> patterns = new ArrayList<>();
 
+    public TitlePatternManager(){
+        this.addPattern("^\\d+\\.\\s");
+    }
+
     // 添加新的标题匹配规则
     public void addPattern(String regex) {
         patterns.add(Pattern.compile(regex));

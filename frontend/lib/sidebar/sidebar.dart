@@ -19,7 +19,8 @@ class Sidebar extends ConsumerWidget {
           onClick: (v) {
             ref.read(sidebarProvider.notifier).setIndex(v);
           },
-          index: 0),
+          index: 0,
+          title: "Chat"),
       SidebarItem(
           icon: const Icon(
             Icons.book,
@@ -29,7 +30,8 @@ class Sidebar extends ConsumerWidget {
           onClick: (v) {
             ref.read(sidebarProvider.notifier).setIndex(v);
           },
-          index: 1),
+          index: 1,
+          title: "Files"),
       SidebarItem(
           icon: const Icon(
             Icons.text_fields,
@@ -39,7 +41,8 @@ class Sidebar extends ConsumerWidget {
           onClick: (v) {
             ref.read(sidebarProvider.notifier).setIndex(v);
           },
-          index: 2)
+          index: 2,
+          title: "Prompts")
     ];
 
     return Padding(

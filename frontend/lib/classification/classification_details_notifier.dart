@@ -65,6 +65,20 @@ class ClassificationDetailsNotifier
       });
     }
   }
+
+  refresh() async {
+    state = AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final Response res = await dio.get(getFilesApi,
+          queryParameters: {"type": arg, "pageId": state.value!.pageId});
+
+      Map<String, dynamic> data = res.data as Map<String, dynamic>;
+
+      final fileList = BaseModel<FileList>.fromJson(
+          data, (d) => FileList.fromJson(d as Map<String, dynamic>));
+      return ClassificationDetailsState(fileList: fileList.data!);
+    });
+  }
 }
 
 final classificationDetailsProvider = AutoDisposeAsyncNotifierProvider.family<

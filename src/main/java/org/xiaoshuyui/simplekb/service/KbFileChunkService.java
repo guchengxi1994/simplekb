@@ -5,6 +5,7 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.xiaoshuyui.simplekb.documentLoader.result.Section;
 import org.xiaoshuyui.simplekb.entity.KbFileChunk;
+import org.xiaoshuyui.simplekb.entity.KbFileChunkKeywords;
 import org.xiaoshuyui.simplekb.mapper.KbFileChunkMapper;
 
 import java.util.ArrayList;
@@ -19,7 +20,26 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
     private KbFileChunkMapper kbFileChunkMapper;
 
     @Resource
+    private KbFileChunkKeywordsService kbFileChunkKeywordsService;
+
+    @Resource
     private QdrantService qdrantService;
+
+    public Long saveChunkAndKeywords(Long fileId,String content,List<String> keywords){
+        KbFileChunk chunk = new KbFileChunk();
+        chunk.setFileId(fileId);
+        chunk.setContent(content);
+        kbFileChunkMapper.insert(chunk);
+        List<KbFileChunkKeywords> keywordsList = new ArrayList<>();
+        for (String keyword : keywords) {
+            KbFileChunkKeywords kbFileChunkKeywords = new KbFileChunkKeywords();
+            kbFileChunkKeywords.setChunkId(chunk.getId());
+            kbFileChunkKeywords.setKeyword(keyword);
+            keywordsList.add(kbFileChunkKeywords);
+        }
+        kbFileChunkKeywordsService.saveKeywords(keywordsList);
+        return chunk.getId();
+    }
 
     public List<KbFileChunk> fullTextSearch(List<String> keywords) {
         Map<String, String> params = new HashMap<>();
@@ -42,6 +62,29 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
             KbFileChunk chunk = new KbFileChunk();
             chunk.setFileId(fileId);
             chunk.setContent(content.toString());
+            chunks.add(chunk);
+        }
+
+        this.saveBatch(chunks, 100);
+
+        for (KbFileChunk chunk : chunks) {
+            try {
+                qdrantService.insertVectorInString(chunk.getId(), chunk.getContent());
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    @Deprecated
+    public boolean insertInStringList(Long fileId, List<String> contents) {
+        List<KbFileChunk> chunks = new ArrayList<>();
+        for (String content : contents) {
+            KbFileChunk chunk = new KbFileChunk();
+            chunk.setFileId(fileId);
+            chunk.setContent(content);
             chunks.add(chunk);
         }
 

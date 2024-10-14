@@ -2,6 +2,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frontend/api/models/file_model.dart';
+import 'package:frontend/classification/upload_file_form.dart';
 import 'package:frontend/indicator/datatable_indicator.dart';
 // ignore: depend_on_referenced_packages
 import 'package:collection/collection.dart';
@@ -32,9 +33,51 @@ class ClassificationDetailsScreen extends ConsumerWidget {
             title: Row(
               children: [
                 Text(
-                  v.fileList.files.first.typeName,
+                  v.fileList.files.isEmpty
+                      ? "无数据"
+                      : v.fileList.files.first.typeName,
                   style: TextStyle(fontSize: 20),
-                )
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                    style: ButtonStyle(
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.0), // 设置圆角半径
+                        ),
+                      ),
+                      backgroundColor:
+                          WidgetStateProperty.all<Color>(Colors.blue), // 设置背景颜色
+                      padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                        EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 8.0), // 设置内边距
+                      ),
+                      textStyle: WidgetStateProperty.all<TextStyle>(
+                        TextStyle(fontSize: 18, color: Colors.white), // 设置文本样式
+                      ),
+                    ),
+                    onPressed: () {
+                      showGeneralDialog(
+                          barrierColor: Colors.transparent,
+                          barrierDismissible: true,
+                          barrierLabel: "upload-file",
+                          context: context,
+                          pageBuilder: (c, _, __) {
+                            return Center(
+                              child: UploadFileForm(
+                                type: arg,
+                              ),
+                            );
+                          }).then((_) {
+                        ref
+                            .read(classificationDetailsProvider(arg).notifier)
+                            .refresh();
+                      });
+                    },
+                    child: Text(
+                      "上传",
+                      style: TextStyle(color: Colors.white),
+                    ))
               ],
             ),
           ),

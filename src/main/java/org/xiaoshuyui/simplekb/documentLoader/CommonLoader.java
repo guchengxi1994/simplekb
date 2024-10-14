@@ -1,12 +1,14 @@
 package org.xiaoshuyui.simplekb.documentLoader;
 
 import org.apache.tika.Tika;
+import org.apache.tika.exception.TikaException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.xiaoshuyui.simplekb.common.StringUtils;
 import org.xiaoshuyui.simplekb.documentLoader.result.Result;
 import org.xiaoshuyui.simplekb.documentLoader.result.Section;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,5 +40,10 @@ public class CommonLoader implements BaseLoader {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public String[] getLines(InputStream stream) throws Exception {
+        final String content = tika.parseToString(stream);
+        return content.split("\n");
     }
 }

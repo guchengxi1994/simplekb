@@ -16,4 +16,8 @@ public class kbFileTypeService {
         getTypesResponse.setTypes(kbFileTypeMapper.getTypeDetails());
         return getTypesResponse;
     }
+
+    public String getTypeNameById(Long typeId) {
+        return kbFileTypeMapper.selectById(typeId).getName();
+    }
 }
