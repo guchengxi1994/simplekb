@@ -27,7 +27,8 @@ public class PKeywordsSearch implements Action {
         this.qdrantService = SpringContextUtil.getBean(QdrantService.class);
     }
 
-    public void execute(Map<String, Object> obj, String key, String stepId) {
+    @Override
+    public void execute(Map<String, Object> obj, String key, String outputKey, String inputType, String outputType, String stepId) {
         String val = obj.get(key).toString();
         var keywords = HanlpUtils.hanLPSegment(val);
         log.info("keywords: " + keywords);

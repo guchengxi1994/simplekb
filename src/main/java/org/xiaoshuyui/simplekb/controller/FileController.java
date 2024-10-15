@@ -14,7 +14,7 @@ import org.xiaoshuyui.simplekb.documentLoader.TitlePatternManager;
 import org.xiaoshuyui.simplekb.entity.response.UploadFileByTypeResponse;
 import org.xiaoshuyui.simplekb.mapper.KbFileChunkKeywordsMapper;
 import org.xiaoshuyui.simplekb.service.KbFileService;
-import org.xiaoshuyui.simplekb.service.kbFileTypeService;
+import org.xiaoshuyui.simplekb.service.KbFileTypeService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -36,7 +36,7 @@ public class FileController {
     private CommonLoader commonLoader;
 
     @Resource
-    private kbFileTypeService kbFileTypeService;
+    private KbFileTypeService kbFileTypeService;
 
     @Resource
     private KbFileService kbFileService;
@@ -136,5 +136,11 @@ public class FileController {
             TitlePatternManager patternManager = new TitlePatternManager();
             return DocumentParser.parseDocument(List.of(lines), patternManager).stream().map((v) -> v.getContent()).toList();
         }
+    }
+
+    @GetMapping("/types/keywords")
+    @Deprecated(since = "for test")
+    public Result getTypeKeywords() {
+        return Result.OK_data(kbFileTypeService.getTypeWithKeywords());
     }
 }

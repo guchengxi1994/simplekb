@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class GetTypesResponse {
-    List<Type> types;
+    List<TypeSummary> typeSummaries;
 }
 
 

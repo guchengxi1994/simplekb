@@ -8,6 +8,8 @@ import org.xiaoshuyui.simplekb.pipeline.actions.Action;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PipelineParser {
 
@@ -18,7 +20,7 @@ public class PipelineParser {
         Document document = builder.parse(input);
         // 获取根节点<pipeline>
         Element root = document.getDocumentElement();
-        if (root.getAttribute("result") != null) {
+        if (!"".equals(root.getAttribute("result"))) {
             String output = root.getAttribute("result");
             Object outputObj = Class.forName(output).getDeclaredConstructor().newInstance();
             pipeline.setOutput(outputObj);
@@ -33,7 +35,13 @@ public class PipelineParser {
             Element stepElement = (Element) stepNodes.item(i);
             String id = stepElement.getAttribute("id");
             String name = stepElement.getAttribute("name");
-            String key = stepElement.getAttribute("key");
+
+            String key, outputKey, inputType, outputType;
+            key = stepElement.getAttribute("inputkey");
+            outputKey = stepElement.getAttribute("outputkey");
+            inputType = stepElement.getAttribute("inputtype");
+            outputType = stepElement.getAttribute("outputtype");
+
 
             // 获取action类名
             Element actionElement = (Element) stepElement.getElementsByTagName("action").item(0);
@@ -65,8 +73,32 @@ public class PipelineParser {
                 nextStepId = ((Element) nextNodes.item(0)).getAttribute("step");
             }
 
+            // 解析<conditions>节点
+            List<Condition> conditions = null;
+            NodeList conditionNodes = stepElement.getElementsByTagName("conditions");
+
+            if (conditionNodes.getLength() > 0) {
+                boolean hasDefault = false;
+                conditions = new ArrayList<>();
+                NodeList cases = stepElement.getElementsByTagName("case");
+                for (int j = 0; j < cases.getLength(); j++) {
+
+                    Element conditionElement = (Element) cases.item(j);
+                    String conditionValue = conditionElement.getAttribute("value");
+                    if ("default".equals(conditionValue)) {
+                        hasDefault = true;
+                    }
+                    String conditionNextStepId = ((Element) conditionElement.getElementsByTagName("next").item(0)).getAttribute("step");
+                    conditions.add(new Condition(conditionValue, conditionNextStepId));
+                }
+
+                if (!hasDefault) {
+                    throw new RuntimeException("No default condition found. Every step must have a default condition.");
+                }
+            }
+
             // 创建Step对象并添加到Pipeline
-            Step step = new Step(id, name, key, action, nextStepId);
+            Step step = new Step(id, name, key, action, nextStepId, outputKey, inputType, outputType, conditions);
             pipeline.addStep(id, step);
         }
 

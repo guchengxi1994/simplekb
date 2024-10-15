@@ -1,11 +1,14 @@
 package org.xiaoshuyui.simplekb.pipeline.actions;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.Map;
 
-public class PEndAction implements Action {
+@Slf4j
+public class PGetFiles implements Action{
 
     @Override
     public void execute(Map<String, Object> obj, String key, String outputKey, String inputType, String outputType, String stepId) {
-        obj.put("step", "流水线完成，正在退出...");
+        log.info("PGetFiles");
     }
 }

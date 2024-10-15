@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <pipeline result="org.xiaoshuyui.simplekb.pipeline.output.KbQueryOutput">
-    <step id="1" name="start-action" key="">
+    <step id="1" name="start-action" inputkey="" outputkey="" inputtype="" outputtype="">
         <action class="org.xiaoshuyui.simplekb.pipeline.actions.PStartAction"/>
         <next step="2"/>
     </step>
-    <step id="2" name="question-rewrite" key="{question}">
+    <step id="2" name="question-rewrite" inputkey="{question}" outputkey="" inputtype="java.lang.String" outputtype="">
         <action class="org.xiaoshuyui.simplekb.pipeline.actions.PQuestionRewrite"/>
         <next step="3"/>
     </step>
-    <step id="3" name="keyword-search" key="{question}">
+    <step id="3" name="keyword-search" inputkey="{question}" outputkey="" inputtype="java.lang.String" outputtype="">
         <action class="org.xiaoshuyui.simplekb.pipeline.actions.PKeywordsSearch"/>
         <next step="4"/>
     </step>
-    <step id="4" name="end-action" key="1">
+    <step id="4" name="end-action" inputkey="" outputkey="" inputtype="" outputtype="">
         <action class="org.xiaoshuyui.simplekb.pipeline.actions.PEndAction"/>
     </step>
 </pipeline>

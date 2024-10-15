@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 public class TitlePatternManager {
     private List<Pattern> patterns = new ArrayList<>();
 
-    public TitlePatternManager(){
+    public TitlePatternManager() {
         this.addPattern("^\\d+\\.\\s");
     }
 

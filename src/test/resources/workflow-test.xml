@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pipeline>
+    <step id="1" name="start-action" inputkey="" outputkey="" inputtype="" outputtype="">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PStartAction"/>
+        <next step="2"/>
+    </step>
+    <step id="2" name="intent-recognition" inputkey="{question}" outputkey="recognition-result" inputtype=""
+          outputtype="">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PIntentRecognition">
+        </action>
+        <conditions>
+            <condition>
+                <case value="6">
+                    <next step="3"/>
+                </case>
+                <case value="default">
+                    <next step="4"/>
+                </case>
+            </condition>
+        </conditions>
+    </step>
+    <step id="3" name="get-files" inputkey="recognition-result" outputkey="" inputtype="" outputtype="">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PGetFiles"/>
+        <next step="5"/>
+    </step>
+    <step id="4" name="get-chunks" inputkey="{question}" outputkey="" inputtype="" outputtype="">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PGetChunks"/>
+        <next step="5"/>
+    </step>
+    <step id="5" name="end-action" inputkey="" outputkey="" inputtype="" outputtype="">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PEndAction"/>
+    </step>
+
+</pipeline>

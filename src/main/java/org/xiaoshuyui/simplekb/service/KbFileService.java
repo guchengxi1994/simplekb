@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.xiaoshuyui.simplekb.entity.KbFile;
 import org.xiaoshuyui.simplekb.entity.response.FileList;
 import org.xiaoshuyui.simplekb.entity.response.FileWithChunks;
@@ -44,7 +43,7 @@ public class KbFileService {
         for (int i = 0; i < lines.size(); i++) {
             var chunkId = kbFileChunkService.saveChunkAndKeywords(fileId, lines.get(i), keywords.get(i));
             qdrantService.insertVectorInString(chunkId, lines.get(i));
-            log.info("chunk "+ i +" inserted");
+            log.info("chunk " + i + " inserted");
         }
     }
 

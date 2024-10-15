@@ -20,7 +20,7 @@ public class PQuestionRewrite implements Action {
     }
 
     @Override
-    public void execute(Map<String, Object> obj, String key, String stepId) {
+    public void execute(Map<String, Object> obj, String key, String outputKey, String inputType, String outputType, String stepId) {
         log.info("执行问题重写" + obj);
         String val = obj.get(key).toString();
 

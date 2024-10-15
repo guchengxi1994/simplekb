@@ -37,7 +37,11 @@ public class PQuestionRewriteEngineController {
     @Value("classpath:pipeline/kb-query-pipeline.xml")
     private Resource xmlResource;
 
+    @Value("classpath:pipeline/query.xml")
+    private Resource queryResource;
+
     @GetMapping("/rewrite")
+    @Deprecated(since = "for test")
     public Result rewrite(@Param("question") String question) {
         log.info("Received question: " + question);
         if (actions.isEmpty()) {
@@ -69,6 +73,7 @@ public class PQuestionRewriteEngineController {
         return Result.OK_data(workflowData.getOrDefault("result", ""));
     }
 
+    @Deprecated(since = "for test")
     private void executeStep(NodeList steps, HashMap<String, Object> workflowData, String stepId) {
         for (int i = 0; i < steps.getLength(); i++) {
             Element step = (Element) steps.item(i);
@@ -84,7 +89,7 @@ public class PQuestionRewriteEngineController {
                     Action action = actions.get(actionClass);
                     if (action != null) {
                         log.info("Executing action: " + actionClass + "workflowData: " + workflowData);
-                        action.execute(workflowData, key, stepId); // 执行action并获取输出
+                        action.execute(workflowData, key, null, null, null, stepId); // 执行action并获取输出
                     }
                 }
 
@@ -125,6 +130,39 @@ public class PQuestionRewriteEngineController {
                 emitter.complete();
             }
         });
+        return emitter;
+    }
+
+
+    @GetMapping("/query")
+    @Deprecated(since = "for test")
+    public SseEmitter query(@Param("question") String question){
+        SseEmitter emitter = new SseEmitter();
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+            SseUtil.sseSend(emitter, "start");
+
+            log.info("Received question: " + question);
+            try {
+                Pipeline pipeline = PipelineParser.parse(queryResource.getInputStream());
+                Map<String, Object> context = new HashMap<>();
+                context.put("{question}", question);
+                context.put("output", pipeline.output);
+                pipeline.execute(context, (String msg) -> SseUtil.sseSend(emitter, msg));
+                SseUtil.sseSend(emitter, "done");
+                emitter.complete();
+            } catch (PipelineException e) {
+                log.error(e.getMessage());
+                SseUtil.sseSend(emitter, e.getMessage());
+                emitter.complete();
+            } catch (Exception e) {
+                log.error(e.getMessage());
+                SseUtil.sseSend(emitter, "流水线内部错误");
+                emitter.complete();
+            }
+        });
+
+
         return emitter;
     }
 }

@@ -19,7 +19,6 @@ public class Pipeline {
         steps.put(id, step);
     }
 
-
     // 执行pipeline
     public void execute(Map<String, Object> context) {
         String currentStepId = startStepId;

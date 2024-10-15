@@ -4,7 +4,6 @@ import lombok.Data;
 
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Data
 public class UploadFileByTypeResponse {
@@ -12,5 +11,5 @@ public class UploadFileByTypeResponse {
     String chunkType;
     String typeName;
     Long typeId;
-    List<LinkedHashMap<String,Object>> chunks;
+    List<LinkedHashMap<String, Object>> chunks;
 }

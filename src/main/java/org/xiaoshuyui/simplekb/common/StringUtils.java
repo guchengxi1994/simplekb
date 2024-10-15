@@ -19,7 +19,7 @@ public class StringUtils {
             if (sb.length() >= maxLength) {
                 result.add(sb.toString());
                 sb = new StringBuilder();
-            }else{
+            } else {
                 sb.append("\n");
             }
         }

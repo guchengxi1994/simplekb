@@ -1,14 +1,12 @@
 package org.xiaoshuyui.simplekb.documentLoader;
 
 import org.apache.tika.Tika;
-import org.apache.tika.exception.TikaException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.xiaoshuyui.simplekb.common.StringUtils;
 import org.xiaoshuyui.simplekb.documentLoader.result.Result;
 import org.xiaoshuyui.simplekb.documentLoader.result.Section;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;

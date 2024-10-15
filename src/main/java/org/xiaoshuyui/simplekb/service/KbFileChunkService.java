@@ -25,7 +25,7 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
     @Resource
     private QdrantService qdrantService;
 
-    public Long saveChunkAndKeywords(Long fileId,String content,List<String> keywords){
+    public Long saveChunkAndKeywords(Long fileId, String content, List<String> keywords) {
         KbFileChunk chunk = new KbFileChunk();
         chunk.setFileId(fileId);
         chunk.setContent(content);

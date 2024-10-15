@@ -22,7 +22,7 @@ public class FileWithKeywords {
 class ChunkWithKeywords {
     String content;
     Long chunkId;
-//    String title;
+    //    String title;
     List<String> keywords;
 
     public KbFileChunk toKbFileChunk() {
