@@ -10,6 +10,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.xiaoshuyui.simplekb.decoration.TimeIt;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +47,7 @@ public class QdrantService {
         this.embeddingModel = embeddingModel;
     }
 
+    @TimeIt
     public float[] getEmbedding(String text) {
         return embeddingModel.embed(text);
     }
@@ -129,6 +131,7 @@ public class QdrantService {
      * @throws ExecutionException   如果执行过程中发生错误
      * @throws InterruptedException 如果执行被中断
      */
+    @TimeIt
     public List<Points.ScoredPoint> searchVector(float[] vector, int topK) throws ExecutionException, InterruptedException {
         // 将基本类型float的数组转换为Float的列表，以便于后续操作
         List<Float> floatList = new ArrayList<>();
@@ -148,6 +151,7 @@ public class QdrantService {
         return getClient().searchAsync(points).get();
     }
 
+    @TimeIt
     public List<Points.ScoredPoint> searchVector(float[] vector, int topK, List<Long> chunkIds) throws ExecutionException, InterruptedException {
         // 将基本类型float的数组转换为Float的列表，以便于后续操作
         List<Float> floatList = new ArrayList<>();

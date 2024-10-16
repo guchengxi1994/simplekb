@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.xiaoshuyui.simplekb.decoration.TimeIt;
 import org.xiaoshuyui.simplekb.entity.KbFile;
+import org.xiaoshuyui.simplekb.entity.KbFileChunk;
 import org.xiaoshuyui.simplekb.entity.response.FileList;
 import org.xiaoshuyui.simplekb.entity.response.FileWithChunks;
 import org.xiaoshuyui.simplekb.entity.response.FileWithKeywords;
@@ -66,6 +68,7 @@ public class KbFileService {
      * @param chunkIds 分块ID列表
      * @return 包含文件和分块信息的列表
      */
+    @TimeIt
     public List<FileWithChunks> getFileWithChunks(List<Long> chunkIds) {
         return kbFileMapper.getFileWithChunks(chunkIds);
     }
@@ -78,6 +81,12 @@ public class KbFileService {
      */
     public FileWithKeywords getFileWithKeywordsById(Long fileId) {
         return kbFileMapper.getFileWithKeywordsById(fileId);
+    }
+
+
+    @TimeIt
+    public List<KbFileChunk> getFileWithChunksByType(Long type) {
+        return kbFileMapper.getFileByTypeId(type);
     }
 
     /**

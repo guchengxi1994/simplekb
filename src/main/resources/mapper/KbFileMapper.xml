@@ -3,6 +3,7 @@
 <mapper namespace="org.xiaoshuyui.simplekb.mapper.KbFileMapper">
 
     <resultMap id="FileWithChunksResultMap" type="org.xiaoshuyui.simplekb.entity.response.FileWithChunks">
+        <id column="kb_file_id" property="id"/>
         <!-- Map file name -->
         <result property="name" column="kb_file_name"/>
         <!-- Map file type name -->
@@ -17,15 +18,14 @@
 
     <select id="getFileWithChunks" resultMap="FileWithChunksResultMap">
         SELECT
-        f.kb_file_name,
+        f.kb_file_name,f.kb_file_id,
         t.type_name,
         COUNT(c.chunk_id) AS chunk_count,
         c.chunk_content
         FROM kb_file f
-        LEFT JOIN kb_file_chunk c ON f.kb_file_id = c.file_id
+        LEFT JOIN kb_file_chunk c ON f.kb_file_id = c.file_id AND c.is_deleted = 0
         LEFT JOIN kb_file_type t ON f.kb_file_type = t.type_id
         WHERE f.is_deleted = 0
-        AND c.is_deleted = 0
         <if test="chunkIds != null and chunkIds.size() > 0">
             AND c.chunk_id IN
             <foreach item="id" collection="chunkIds" open="(" separator="," close=")">
@@ -65,6 +65,13 @@
                  LEFT JOIN kb_file_chunk_keywords kfck ON fc.chunk_id = kfck.chunk_id
                  LEFT JOIN kb_file_type ft ON f.kb_file_type = ft.type_id
         where f.kb_file_id = #{fileId}
+    </select>
+
+    <select id="getFileByTypeId" resultType="org.xiaoshuyui.simplekb.entity.KbFileChunk">
+        SELECT fc.chunk_id AS id, fc.chunk_content AS content, fc.file_id as fileId
+        from kb_file f
+                 LEFT JOIN kb_file_chunk fc ON f.kb_file_id = fc.file_id
+        where f.kb_file_type = #{typeId}
     </select>
 
 

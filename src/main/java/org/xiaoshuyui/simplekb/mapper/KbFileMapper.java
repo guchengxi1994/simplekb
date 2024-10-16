@@ -3,6 +3,7 @@ package org.xiaoshuyui.simplekb.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import org.xiaoshuyui.simplekb.entity.KbFile;
+import org.xiaoshuyui.simplekb.entity.KbFileChunk;
 import org.xiaoshuyui.simplekb.entity.response.FileWithChunks;
 import org.xiaoshuyui.simplekb.entity.response.FileWithKeywords;
 
@@ -31,5 +32,8 @@ public interface KbFileMapper extends BaseMapper<KbFile> {
      * @return 包含文件及其关键词信息的对象
      */
     FileWithKeywords getFileWithKeywordsById(@Param("fileId") Long fileId);
+
+
+    List<KbFileChunk> getFileByTypeId(@Param("typeId")Long typeId);
 }
 

@@ -12,12 +12,11 @@ import org.xiaoshuyui.simplekb.common.HanlpUtils;
 import org.xiaoshuyui.simplekb.common.Result;
 import org.xiaoshuyui.simplekb.common.SseUtil;
 import org.xiaoshuyui.simplekb.entity.request.ChatRequest;
-import org.xiaoshuyui.simplekb.entity.response.ChatResponse;
-import org.xiaoshuyui.simplekb.entity.response.QuestionRewriteResponse;
-import org.xiaoshuyui.simplekb.entity.response.UploadFileResponse;
+import org.xiaoshuyui.simplekb.entity.response.*;
 import org.xiaoshuyui.simplekb.service.*;
 import reactor.core.Disposable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -37,6 +36,8 @@ public class LLMController {
     String questionRewriteTemplate = null;
 
     String rewriteResultToJsonTemplate = null;
+
+    String chatDirectlyTemplate = null;
 
     String answerQuestionTemplate = """
             You are an expert AI assistant that explains your reasoning step by step. For each step, provide a title that describes what you're doing in that step, along with the content. Decide if you need another step or if you're ready to give the final answer. Respond in JSON format with 'title', 'content', and 'next_action' (either 'continue' or 'final_answer') keys. USE AS MANY REASONING STEPS AS POSSIBLE. AT LEAST 3. BE AWARE OF YOUR LIMITATIONS AS AN LLM AND WHAT YOU CAN AND CANNOT DO. IN YOUR REASONING, INCLUDE EXPLORATION OF ALTERNATIVE ANSWERS. CONSIDER YOU MAY BE WRONG, AND IF YOU ARE WRONG IN YOUR REASONING, WHERE IT WOULD BE. FULLY TEST ALL OTHER POSSIBILITIES. YOU CAN BE WRONG. WHEN YOU SAY YOU ARE RE-EXAMINING, ACTUALLY RE-EXAMINE, AND USE ANOTHER APPROACH TO DO SO. DO NOT JUST SAY YOU ARE RE-EXAMINING. USE AT LEAST 3 METHODS TO DERIVE THE ANSWER. USE BEST PRACTICES.
@@ -244,6 +245,161 @@ public class LLMController {
         return emitter;
     }
 
+    /**
+     * 处理直接聊天请求
+     * 该方法接收一个聊天请求，然后通过SSE（Server-Sent Events）方式发送聊天响应
+     * 它会根据请求的问题，搜索相关的文档片段，并使用预设的模板和LLM（Large Language Model）服务进行回答
+     *
+     * @param request 聊天请求对象，包含用户的问题
+     * @return 返回一个SseEmitter对象，用于服务器向客户端发送事件
+     */
+    @PostMapping("/chat/direct")
+    public SseEmitter chatDirect(@RequestBody ChatRequest request) {
+        // 检查是否存在直接聊天的模板，如果不存在则从数据库中获取
+        if (chatDirectlyTemplate == null) {
+            chatDirectlyTemplate = kbPromptService.getByName("chat_directly");
+        }
+
+        // 创建一个SseEmitter对象，设置超时时间为3分钟
+        SseEmitter emitter = new SseEmitter(3 * 60 * 1000L);
+        // 在单独的线程中执行聊天逻辑，以避免阻塞主线程
+        Executors.newSingleThreadExecutor().submit(() -> {
+            ChatResponse response = new ChatResponse();
+            List<Points.ScoredPoint> result2 = null;
+            try {
+                // 设置聊天响应的阶段信息，并发送到客户端
+                response.setStage("文档检索中...");
+                SseUtil.sseSend(emitter, response);
+                // 根据用户的问题，搜索相关的文档片段
+                result2 = qdrantService.searchVector(qdrantService.getEmbedding(request.getQuestion()), topK);
+                List<Long> chunkIds2 = result2.stream().map(x -> x.getId().getNum()).toList();
+                var fileWithChunks = kbFileService.getFileWithChunks(chunkIds2);
+                // 更新聊天响应的阶段信息，并发送到客户端
+                response.setStage("检索完成，问题回答中...");
+                SseUtil.sseSend(emitter, response);
+                StringBuffer sb = new StringBuffer();
+                // 使用模板和搜索到的文档片段，以及用户的问题，生成聊天回答的内容
+                var t = chatDirectlyTemplate.replace("{context}", fileWithChunksToString(fileWithChunks)).replace("{question}", request.getQuestion());
+
+                log.info("t===> \n" + t);
+                // 订阅LLM服务的流式回答，处理响应
+                response.setStage("回答中...");
+                Disposable disposable = llmService
+                        .streamChat(t).doOnComplete(() -> {
+                            response.setDone(true);
+                            response.setStage("回答结束");
+                            response.setContent("");
+                            List<RefFile> refs = new ArrayList<>();
+                            for (var f : fileWithChunks) {
+                                refs.add(new RefFile(f.getName(), f.getId()));
+                            }
+                            response.setRefs(refs);
+                            SseUtil.sseSend(emitter, response);
+                            log.info("complete===> \n" + sb);
+                        })
+                        .subscribe(value -> {
+                                    sb.append(value);
+                                    response.setContent(value);
+                                    SseUtil.sseSend(emitter, response);
+                                }, emitter::completeWithError,
+                                emitter::complete);
+
+                // 错误处理，如果发生异常且订阅未取消，则取消订阅
+                emitter.onError((e) -> {
+                    if (!disposable.isDisposed()) {
+                        disposable.dispose();
+                    }
+                });
+            } catch (Exception e) {
+                // 异常处理，如果在处理请求过程中发生异常，发送异常信息到客户端，并完成SSE连接
+                response.setStage("");
+                response.setContent("查询相关条目异常。");
+                SseUtil.sseSend(emitter, response);
+                emitter.complete();
+            }
+        });
+
+        // 返回SseEmitter对象，用于服务器向客户端发送事件
+        return emitter;
+    }
+
+
+    // 处理直接聊天请求，并带有特定类型的ID
+    @PostMapping("/chat/direct/{typeId}")
+    public SseEmitter chatDirectWithTypeId(@RequestBody ChatRequest request, @PathVariable("typeId") Long typeId) {
+        // 检查是否存在直接聊天的模板，如果不存在则从数据库中获取
+        if (chatDirectlyTemplate == null) {
+            chatDirectlyTemplate = kbPromptService.getByName("chat_directly");
+        }
+
+        // 根据typeId查询所有相关的chunk
+        var chunks = kbFileService.getFileWithChunksByType(typeId);
+
+        // 创建一个SseEmitter对象，设置超时时间为3分钟
+        SseEmitter emitter = new SseEmitter(3 * 60 * 1000L);
+        // 在单独的线程中执行聊天逻辑，以避免阻塞主线程
+        Executors.newSingleThreadExecutor().submit(() -> {
+            ChatResponse response = new ChatResponse();
+            List<Points.ScoredPoint> result2 = null;
+            try {
+                // 设置聊天响应的阶段信息，并发送到客户端
+                response.setStage("文档检索中...");
+                SseUtil.sseSend(emitter, response);
+                // 根据用户的问题，搜索相关的文档片段
+                result2 = qdrantService.searchVector(qdrantService.getEmbedding(request.getQuestion()), topK, chunks.stream().map(x -> x.getId()).toList());
+                List<Long> chunkIds2 = result2.stream().map(x -> x.getId().getNum()).toList();
+                log.info("chunkIds2===>" + chunkIds2);
+                var fileWithChunks = kbFileService.getFileWithChunks(chunkIds2);
+                // 更新聊天响应的阶段信息，并发送到客户端
+                response.setStage("检索完成，问题回答中...");
+                SseUtil.sseSend(emitter, response);
+                StringBuffer sb = new StringBuffer();
+                // 使用模板和搜索到的文档片段，以及用户的问题，生成聊天回答的内容
+                var t = chatDirectlyTemplate.replace("{context}", fileWithChunksToString(fileWithChunks)).replace("{question}", request.getQuestion());
+
+//                log.info("t===>" + t);
+                // 订阅LLM服务的流式回答，处理响应
+                response.setStage("回答中...");
+                Disposable disposable = llmService
+                        .streamChat(t).doOnComplete(() -> {
+                            response.setDone(true);
+                            response.setStage("回答结束");
+                            response.setContent("");
+                            List<RefFile> refs = new ArrayList<>();
+                            for (var f : fileWithChunks) {
+                                refs.add(new RefFile(f.getName(), f.getId()));
+                            }
+                            response.setRefs(refs);
+                            SseUtil.sseSend(emitter, response);
+                            log.info("complete===> \n" + sb);
+                        })
+                        .subscribe(value -> {
+                                    sb.append(value);
+                                    response.setContent(value);
+                                    SseUtil.sseSend(emitter, response);
+                                }, emitter::completeWithError,
+                                emitter::complete);
+
+                // 错误处理，如果发生异常且订阅未取消，则取消订阅
+                emitter.onError((e) -> {
+                    if (!disposable.isDisposed()) {
+                        disposable.dispose();
+                    }
+                });
+            } catch (Exception e) {
+                // 异常处理，如果在处理请求过程中发生异常，发送异常信息到客户端，并完成SSE连接
+                response.setStage("");
+                response.setContent("查询相关条目异常。");
+                SseUtil.sseSend(emitter, response);
+                emitter.complete();
+            }
+        });
+
+        // 返回SseEmitter对象，用于服务器向客户端发送事件
+        return emitter;
+    }
+
+
     @PostMapping("/insert")
     @Deprecated(since = "for test")
     public Result insert(String vector) {
@@ -338,5 +494,17 @@ public class LLMController {
 
         var keywords = HanlpUtils.hanLPSegment(content);
         return Result.OK("ok", kbFileChunkService.fullTextSearch(keywords));
+    }
+
+    String fileWithChunksToString(List<FileWithChunks> fileWithChunks) {
+        StringBuffer sb = new StringBuffer();
+        int i = 1;
+        for (var fileWithChunk : fileWithChunks) {
+            for (var chunk : fileWithChunk.getChunks()) {
+                sb.append("第").append(i++).append("条信息：").append(chunk).append("\n\n");
+            }
+        }
+
+        return sb.toString();
     }
 }

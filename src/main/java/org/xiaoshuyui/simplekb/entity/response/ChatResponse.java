@@ -2,6 +2,8 @@ package org.xiaoshuyui.simplekb.entity.response;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * ChatResponse类用于封装聊天机器人的响应信息
  * 它包含了响应的不同阶段、内容、唯一标识以及处理状态
@@ -19,5 +21,8 @@ public class ChatResponse {
 
     // 标识响应是否处理完成
     boolean done;
+
+    List<RefFile> refs;
 }
+
 

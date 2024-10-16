@@ -10,6 +10,8 @@ import java.util.List;
  */
 @Data
 public class FileWithChunks {
+    Long id;
+
     // The name of the file, used to identify the file uniquely.
     String name;
 

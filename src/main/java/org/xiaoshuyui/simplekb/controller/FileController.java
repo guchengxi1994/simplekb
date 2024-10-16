@@ -6,11 +6,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.xiaoshuyui.simplekb.common.CsvLoader;
 import org.xiaoshuyui.simplekb.common.Result;
+import org.xiaoshuyui.simplekb.common.SseUtil;
 import org.xiaoshuyui.simplekb.common.StringUtils;
 import org.xiaoshuyui.simplekb.documentLoader.CommonLoader;
 import org.xiaoshuyui.simplekb.documentLoader.DocumentParser;
 import org.xiaoshuyui.simplekb.documentLoader.TitlePatternManager;
+import org.xiaoshuyui.simplekb.entity.request.CsvData;
 import org.xiaoshuyui.simplekb.entity.response.UploadFileByTypeResponse;
 import org.xiaoshuyui.simplekb.mapper.KbFileChunkKeywordsMapper;
 import org.xiaoshuyui.simplekb.service.KbFileService;
@@ -20,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 @RestController
 @RequestMapping("/file")
@@ -154,6 +159,64 @@ public class FileController {
         } catch (Exception e) {
             return Result.error("失败" + e.getMessage());
         }
+    }
+
+    /**
+     * 使用流方式按类型上传文件
+     * 该方法接收一个MultipartFile对象，并通过SseEmitter发送上传进度或结果
+     * 主要用于处理CSV文件上传，将CSV数据转换为特定格式并上传处理
+     *
+     * @param file 待上传的文件，作为MultipartFile类型传递
+     * @return 返回一个SseEmitter对象，用于服务器发送事件给客户端
+     */
+    @PostMapping("/upload-by-type/stream")
+    public SseEmitter uploadStream(@RequestParam("file") MultipartFile file) {
+        // 创建一个新的SseEmitter实例，用于发送服务器事件
+        SseEmitter emitter = new SseEmitter();
+
+        // 使用单线程执行器来异步处理文件上传
+        Executors.newSingleThreadExecutor().execute(() -> {
+            // 通过SseEmitter发送消息，表示文件读取中
+            SseUtil.sseSend(emitter, "读取文件中...");
+
+            try {
+                // 使用CsvLoader从文件输入流中加载CSV数据，转换为CsvData对象列表
+                List<CsvData> dataList = CsvLoader.loadCsv(file.getInputStream(), CsvData.class);
+
+                // 遍历CsvData列表，处理每个数据项
+                for (CsvData data : dataList) {
+                    // 发送当前处理的CsvData标题
+                    SseUtil.sseSend(emitter, "正在处理：" + data.getTitle());
+
+                    var typeId = kbFileTypeService.getTypeIdByName(data.getType());
+
+                    if (typeId == null) {
+                        SseUtil.sseSend(emitter, "未找到类型：" + data.getType());
+                        continue;
+                    }
+
+                    // 将CsvData对象转换为UploadFileByTypeResponse对象，并上传处理
+                    var res = data.toUploadFileByTypeResponse(typeId);
+                    kbFileService.uploadByType(res);
+                }
+
+                // 文件处理完成后，发送完成消息
+                SseUtil.sseSend(emitter, "处理完成");
+
+                // 完成SseEmitter，表示事件流结束
+                emitter.complete();
+
+            } catch (Exception e) {
+                // 捕获异常，并发送文件读取失败的消息
+                SseUtil.sseSend(emitter, "读取文件失败");
+
+                // 完成SseEmitter，表示事件流结束
+                emitter.complete();
+            }
+        });
+
+        // 返回SseEmitter对象
+        return emitter;
     }
 
     /**

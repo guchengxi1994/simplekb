@@ -32,6 +32,12 @@
         <mybatisplus.version>3.5.5</mybatisplus.version>
         <swagger.version>2.5.0</swagger.version>
         <tika.version>2.9.2</tika.version>
+        <poi.version>5.3.0</poi.version>
+        <csv.version>5.9</csv.version>
+        <qdrant.version>1.11.0</qdrant.version>
+        <protobuf.version>4.28.2</protobuf.version>
+        <guava.version>33.3.1-jre</guava.version>
+        <hanlp.version>portable-1.8.4</hanlp.version>
     </properties>
 
     <dependencyManagement>
@@ -137,13 +143,19 @@
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-ooxml</artifactId>
-            <version>5.3.0</version>
+            <version>${poi.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi-scratchpad</artifactId>
-            <version>5.3.0</version>
+            <version>${poi.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>${csv.version}</version>
         </dependency>
 
 
@@ -168,19 +180,19 @@
         <dependency>
             <groupId>io.qdrant</groupId>
             <artifactId>client</artifactId>
-            <version>1.11.0</version>
+            <version>${qdrant.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>4.28.2</version>
+            <version>${protobuf.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>33.3.1-jre</version> <!-- Replace with the appropriate version -->
+            <version>${guava.version}</version> <!-- Replace with the appropriate version -->
         </dependency>
 
 
@@ -188,7 +200,7 @@
         <dependency>
             <groupId>com.hankcs</groupId>
             <artifactId>hanlp</artifactId>
-            <version>portable-1.8.4</version>
+            <version>${hanlp.version}</version>
         </dependency>
     </dependencies>
 
