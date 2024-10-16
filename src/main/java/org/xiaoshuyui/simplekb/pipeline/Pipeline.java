@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -32,6 +33,9 @@ public class Pipeline {
                 throw new PipelineException("流水线解析异常");
             }
             currentStepId = step.execute(context);
+            if (!Objects.equals(step.getName(), "end-action") && Objects.equals(currentStepId, "")) {
+                throw new PipelineException("流水线解析异常，无法确定下一步");
+            }
         }
     }
 
@@ -54,6 +58,9 @@ public class Pipeline {
                 throw new PipelineException("流水线解析异常");
             }
             currentStepId = step.execute(context);
+            if (!Objects.equals(step.getName(), "end-action") && Objects.equals(currentStepId, "")) {
+                throw new PipelineException("流水线解析异常，无法确定下一步");
+            }
             log.info("Next Step " + currentStepId + " executed.");
         }
     }

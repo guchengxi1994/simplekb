@@ -13,14 +13,27 @@ import java.util.List;
 
 public class PipelineParser {
 
+    /**
+     * 解析输入流中的Pipeline配置
+     * 该方法读取一个XML格式的输入流，解析其中的pipeline配置，并构建相应的Pipeline对象
+     *
+     * @param input 包含Pipeline配置的XML输入流
+     * @return 解析后构建的Pipeline对象
+     * @throws Exception 解析过程中可能出现的异常
+     */
     public static Pipeline parse(InputStream input) throws Exception {
+        // 创建Pipeline对象
         Pipeline pipeline = new Pipeline();
+        // 创建文档构建工厂
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        // 创建文档构建器
         DocumentBuilder builder = factory.newDocumentBuilder();
+        // 解析输入流构建文档对象
         Document document = builder.parse(input);
         // 获取根节点<pipeline>
         Element root = document.getDocumentElement();
-        if (!"".equals(root.getAttribute("result"))) {
+        // 检查并设置Pipeline的输出
+        if (!root.getAttribute("result").isEmpty()) {
             String output = root.getAttribute("result");
             Object outputObj = Class.forName(output).getDeclaredConstructor().newInstance();
             pipeline.setOutput(outputObj);
@@ -30,30 +43,31 @@ public class PipelineParser {
         String startStepId = null;
         boolean hasStartAction = false;
         boolean hasEndAction = false;
+        // 遍历所有<step>节点
         NodeList stepNodes = root.getElementsByTagName("step");
         for (int i = 0; i < stepNodes.getLength(); i++) {
             Element stepElement = (Element) stepNodes.item(i);
+            // 获取step属性
             String id = stepElement.getAttribute("id");
             String name = stepElement.getAttribute("name");
-
             String key, outputKey, inputType, outputType;
             key = stepElement.getAttribute("inputkey");
             outputKey = stepElement.getAttribute("outputkey");
             inputType = stepElement.getAttribute("inputtype");
             outputType = stepElement.getAttribute("outputtype");
 
-
-            // 获取action类名
+            // 获取并创建Action实例
             Element actionElement = (Element) stepElement.getElementsByTagName("action").item(0);
             String actionClass = actionElement.getAttribute("class");
-
-            // 创建Action实例
             Action action = (Action) Class.forName(actionClass).getDeclaredConstructor().newInstance();
 
-            // 检查是否是PStartAction或PEndAction
+            // 检查并设置PStartAction和PEndAction
             if (actionClass.equals("org.xiaoshuyui.simplekb.pipeline.actions.PStartAction")) {
                 if (hasStartAction) {
                     throw new RuntimeException("Multiple PStartAction found. There should be only one.");
+                }
+                if (!"start-action".equals(name)) {
+                    throw new RuntimeException("Start action should be named as 'start-action'.");
                 }
                 hasStartAction = true;
                 startStepId = id;
@@ -62,6 +76,9 @@ public class PipelineParser {
             if (actionClass.equals("org.xiaoshuyui.simplekb.pipeline.actions.PEndAction")) {
                 if (hasEndAction) {
                     throw new RuntimeException("Multiple PEndAction found. There should be only one.");
+                }
+                if (!"end-action".equals(name)) {
+                    throw new RuntimeException("End action should be named as 'end-action'.");
                 }
                 hasEndAction = true;
             }
@@ -76,13 +93,11 @@ public class PipelineParser {
             // 解析<conditions>节点
             List<Condition> conditions = null;
             NodeList conditionNodes = stepElement.getElementsByTagName("conditions");
-
             if (conditionNodes.getLength() > 0) {
                 boolean hasDefault = false;
                 conditions = new ArrayList<>();
                 NodeList cases = stepElement.getElementsByTagName("case");
                 for (int j = 0; j < cases.getLength(); j++) {
-
                     Element conditionElement = (Element) cases.item(j);
                     String conditionValue = conditionElement.getAttribute("value");
                     if ("default".equals(conditionValue)) {
@@ -113,6 +128,8 @@ public class PipelineParser {
         // 设置起始步骤
         pipeline.setStartStepId(startStepId);
 
+        // 返回构建的Pipeline对象
         return pipeline;
     }
 }
+

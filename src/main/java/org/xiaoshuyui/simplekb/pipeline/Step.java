@@ -9,21 +9,38 @@ import java.util.Map;
 
 @Data
 @Slf4j
+/**
+ * Step类代表流程中的一个步骤，包含动作（action）和条件（conditions）
+ * 它定义了如何执行步骤以及如何根据条件跳转到下一个步骤
+ */
 public class Step {
 
-    private String id;
-    private String name;
-    private String key;
-    private Action action;
-    private String nextStepId;
+    private String id; // 步骤的唯一标识
+    private String name; // 步骤的名称
+    private String key; // 步骤的键，用于在上下文中查找数据
+    private Action action; // 步骤要执行的动作
+    private String nextStepId; // 下一个步骤的ID
 
-    private String outputKey;
+    private String outputKey; // 步骤执行结果的键，用于在上下文中存储结果
 
-    private String inputType;
+    private String inputType; // 输入数据的类型
 
-    private String outputType;
-    private List<Condition> conditions; // 条件列表
+    private String outputType; // 输出数据的类型
+    private List<Condition> conditions; // 条件列表，用于确定下一步骤
 
+    /**
+     * Step类的构造函数
+     *
+     * @param id         步骤的唯一标识
+     * @param name       步骤的名称
+     * @param key        步骤的键，用于在上下文中查找数据
+     * @param action     步骤要执行的动作
+     * @param nextStepId 下一个步骤的ID
+     * @param outputKey  步骤执行结果的键，用于在上下文中存储结果
+     * @param inputType  输入数据的类型
+     * @param outputType 输出数据的类型
+     * @param conditions 条件列表，用于确定下一步骤
+     */
     public Step(String id, String name, String key, Action action, String nextStepId, String outputKey, String inputType, String outputType, List<Condition> conditions) {
         this.id = id;
         this.name = name;
@@ -36,6 +53,12 @@ public class Step {
         this.conditions = conditions;
     }
 
+    /**
+     * 执行步骤的方法
+     *
+     * @param context 上下文，包含执行步骤所需的数据
+     * @return 下一个步骤的ID
+     */
     public String execute(Map<String, Object> context) {
         action.execute(context, key, outputKey, inputType, outputType, id);
 
@@ -55,3 +78,4 @@ public class Step {
         return nextStepId;
     }
 }
+

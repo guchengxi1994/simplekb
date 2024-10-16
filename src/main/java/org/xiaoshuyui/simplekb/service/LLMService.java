@@ -19,6 +19,7 @@ import java.util.List;
 @Slf4j
 public class LLMService {
 
+    // 静态文件类型列表，避免重复初始化
     static List<KbFileType> types = null;
     @Resource
     KbPromptService kbPromptService;
@@ -36,6 +37,7 @@ public class LLMService {
     @Resource
     private Loader loader;
 
+    // 构造函数，注入默认聊天客户端
     LLMService(@Qualifier("defaultChat") ChatClient defaultClient) {
         this.defaultClient = defaultClient;
     }
@@ -94,11 +96,14 @@ public class LLMService {
         return -1;
     }
 
+    // 发送聊天消息并返回结果
     public String chat(String prompt) {
         return defaultClient.prompt().user(prompt).call().content();
     }
 
+    // 发送聊天消息并流式返回结果
     public Flux<String> streamChat(String prompt) {
         return defaultClient.prompt().user(prompt).stream().content();
     }
 }
+

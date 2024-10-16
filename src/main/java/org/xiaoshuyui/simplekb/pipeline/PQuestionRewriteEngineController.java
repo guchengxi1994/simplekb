@@ -136,7 +136,7 @@ public class PQuestionRewriteEngineController {
 
     @GetMapping("/query")
     @Deprecated(since = "for test")
-    public SseEmitter query(@Param("question") String question){
+    public SseEmitter query(@Param("question") String question) {
         SseEmitter emitter = new SseEmitter();
 
         Executors.newSingleThreadExecutor().execute(() -> {

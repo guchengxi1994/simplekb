@@ -13,18 +13,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 文件分块服务类
+ * 该类处理文件分块的保存、关键字关联及搜索等功能
+ */
 @Service
 public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChunk> {
 
     @Resource
-    private KbFileChunkMapper kbFileChunkMapper;
+    private KbFileChunkMapper kbFileChunkMapper; // 文件分块的持久层接口
 
     @Resource
-    private KbFileChunkKeywordsService kbFileChunkKeywordsService;
+    private KbFileChunkKeywordsService kbFileChunkKeywordsService; // 文件分块关键字服务
 
     @Resource
-    private QdrantService qdrantService;
+    private QdrantService qdrantService; // 向量数据库服务
 
+    /**
+     * 保存文件分块及其关键字
+     *
+     * @param fileId   文件ID
+     * @param content  分块内容
+     * @param keywords 关键字列表
+     * @return 保存的分块ID
+     */
     public Long saveChunkAndKeywords(Long fileId, String content, List<String> keywords) {
         KbFileChunk chunk = new KbFileChunk();
         chunk.setFileId(fileId);
@@ -41,6 +53,12 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
         return chunk.getId();
     }
 
+    /**
+     * 全文搜索分块
+     *
+     * @param keywords 关键字列表
+     * @return 搜索到的分块列表
+     */
     public List<KbFileChunk> fullTextSearch(List<String> keywords) {
         Map<String, String> params = new HashMap<>();
         StringBuilder keyword = new StringBuilder();
@@ -56,6 +74,13 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
         return kbFileChunkMapper.searchByKeywords(params);
     }
 
+    /**
+     * 批量插入文件分块并生成向量
+     *
+     * @param fileId   文件ID
+     * @param contents 分块内容列表
+     * @return 插入是否成功
+     */
     public boolean insert(Long fileId, List<Section> contents) {
         List<KbFileChunk> chunks = new ArrayList<>();
         for (Section content : contents) {
@@ -77,7 +102,14 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
         return true;
     }
 
-
+    /**
+     * 插入文件分块并生成向量（已弃用）
+     *
+     * @param fileId   文件ID
+     * @param contents 分块内容列表
+     * @return 插入是否成功
+     * @deprecated 使用 {@link #insert(Long, List)} 替代
+     */
     @Deprecated
     public boolean insertInStringList(Long fileId, List<String> contents) {
         List<KbFileChunk> chunks = new ArrayList<>();
@@ -100,3 +132,4 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
         return true;
     }
 }
+

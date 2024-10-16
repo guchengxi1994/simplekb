@@ -27,6 +27,13 @@ public class KbFileService {
     @Resource
     private QdrantService qdrantService;
 
+    /**
+     * 创建新文件
+     *
+     * @param fileName 文件名
+     * @param typeId   文件类型ID
+     * @return 新文件的ID
+     */
     public long newFile(String fileName, long typeId) {
         KbFile kbFile = new KbFile();
         kbFile.setName(fileName);
@@ -35,6 +42,12 @@ public class KbFileService {
         return kbFile.getId();
     }
 
+    /**
+     * 根据类型上传文件
+     *
+     * @param request 包含文件信息和分块数据的请求对象
+     * @throws Exception 如果上传过程中发生错误，则抛出异常
+     */
     public void uploadByType(UploadFileByTypeResponse request) throws Exception {
         var fileId = this.newFile(request.getFilename(), request.getTypeId());
 
@@ -47,14 +60,34 @@ public class KbFileService {
         }
     }
 
+    /**
+     * 根据分块ID获取文件及其分块信息
+     *
+     * @param chunkIds 分块ID列表
+     * @return 包含文件和分块信息的列表
+     */
     public List<FileWithChunks> getFileWithChunks(List<Long> chunkIds) {
         return kbFileMapper.getFileWithChunks(chunkIds);
     }
 
+    /**
+     * 根据文件ID获取文件及其关键词信息
+     *
+     * @param fileId 文件ID
+     * @return 包含文件和关键词信息的对象
+     */
     public FileWithKeywords getFileWithKeywordsById(Long fileId) {
         return kbFileMapper.getFileWithKeywordsById(fileId);
     }
 
+    /**
+     * 根据文件类型分页获取文件及其关键词信息
+     *
+     * @param type     文件类型ID
+     * @param pageId   页码
+     * @param pageSize 页面大小
+     * @return 包含文件列表、总文件数和页面大小的文件列表对象
+     */
     public FileList getFileWithKeywordsByType(Long type, int pageId, int pageSize) {
         Page<KbFile> page = new Page<>(pageId, pageSize);
         IPage<KbFile> parentPage = kbFileMapper.selectPage(page, new QueryWrapper<KbFile>().eq("kb_file_type", type));
@@ -72,3 +105,4 @@ public class KbFileService {
         return fileList;
     }
 }
+
