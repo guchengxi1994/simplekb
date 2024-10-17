@@ -59,6 +59,7 @@ public class LLMService {
         request.setQuery(query);
         request.setTopN(documents.size());
         request.setDocuments(documents);
+//        request.setDocuments(documents.stream().map(v->query+v).collect(Collectors.toList()));
         RerankResponse response = HttpClient.sendPostRequest(rerankHost, request, RerankResponse.class);
         if (response == null) {
             return new ArrayList<>();

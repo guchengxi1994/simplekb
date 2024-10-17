@@ -84,4 +84,62 @@
             <result column="chunk_content" property="content"/>
         </collection>
     </resultMap>
+
+
+
+
+    <resultMap id="FileBasic" type="org.xiaoshuyui.simplekb.entity.response.FileWithChunks">
+        <id column="kb_file_id" property="id"/>
+        <result property="name" column="kb_file_name"/>
+        <result property="type" column="type_name"/>
+    </resultMap>
+
+
+    <!-- Step 1: 根据 chunkIds 查询对应的文件ID -->
+    <select id="getFileIdsByChunkIds" resultType="java.lang.Long">
+        SELECT DISTINCT c.file_id
+        FROM kb_file_chunk c
+        WHERE c.chunk_id IN
+        <foreach item="id" collection="chunkIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND c.is_deleted = 0
+    </select>
+
+    <select id="getFileBasicInfo" resultMap="FileBasic">
+        SELECT
+            f.kb_file_id,
+            f.kb_file_name,
+            t.type_name
+        FROM kb_file f
+                 LEFT JOIN kb_file_type t ON f.kb_file_type = t.type_id
+        WHERE f.is_deleted = 0
+        AND f.kb_file_id IN
+        <foreach item="id" collection="fileIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <resultMap id="FileChunksResultMap" type="org.xiaoshuyui.simplekb.entity.KbFileChunk">
+        <id column="chunk_id" property="id"/>
+        <result property="content" column="chunk_content"/>
+        <result property="fileId" column="file_id"/>
+    </resultMap>
+
+    <select id="getFileChunksByFileIdsAndChunkIds" resultMap="FileChunksResultMap">
+        SELECT
+        c.chunk_id,
+        c.chunk_content,
+        c.file_id
+        FROM kb_file_chunk c
+        WHERE c.file_id IN
+        <foreach item="id" collection="fileIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND c.is_deleted = 0
+        AND c.chunk_id IN
+        <foreach item="id" collection="chunkIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

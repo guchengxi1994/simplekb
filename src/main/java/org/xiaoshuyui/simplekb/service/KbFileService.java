@@ -15,6 +15,7 @@ import org.xiaoshuyui.simplekb.entity.response.FileWithKeywords;
 import org.xiaoshuyui.simplekb.entity.response.UploadFileByTypeResponse;
 import org.xiaoshuyui.simplekb.mapper.KbFileMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -112,6 +113,43 @@ public class KbFileService {
         fileList.setPageSize(pageSize);
 
         return fileList;
+    }
+
+
+    @TimeIt
+    /**
+     * 根据分块ID列表获取文件及其分块信息的优化版本
+     * 此方法通过一次性获取所有必要的文件和分块信息来减少数据库访问次数，提高效率
+     *
+     * @param chunkIds 分块ID列表，用于识别特定的文件分块
+     * @return 返回一个列表，包含文件及其对应的分块信息如果找不到对应的文件，返回空列表
+     *
+     * [NOTICE] FOR TEST
+     */
+    public List<FileWithChunks> getFileWithChunksV2(List<Long> chunkIds) {
+        // 通过分块ID列表获取对应的文件ID列表
+        List<Long> fileIds = kbFileMapper.getFileIdsByChunkIds(chunkIds);
+        if (fileIds.isEmpty()) {
+            // 如果没有文件ID与分块ID列表匹配，则直接返回空列表
+            return new ArrayList<>();
+        }
+        // 获取文件的基本信息和分块内容
+        List<FileWithChunks> files = kbFileMapper.getFileBasicInfo(fileIds);
+        List<KbFileChunk> chunks = kbFileMapper.getFileChunksByFileIdsAndChunkIds(fileIds, chunkIds);
+
+        // 遍历文件列表，为每个文件设置其对应的分块信息
+        for (FileWithChunks file : files) {
+            // 过滤出属于当前文件的分块
+            List<KbFileChunk> cks = chunks.stream()
+                    .filter(chunk -> chunk.getFileId().equals(file.getId()))
+                    .toList();
+            // 设置文件的分块内容和分块数量
+            file.setChunks(cks.stream().map(KbFileChunk::getContent).toList());
+            file.setChunkCount(cks.size());
+        }
+
+        // 返回包含文件和分块信息的列表
+        return kbFileMapper.getFileWithChunks(chunkIds);
     }
 }
 

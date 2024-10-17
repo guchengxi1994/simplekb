@@ -201,8 +201,9 @@ public class LLMController {
             log.info("chunkIds2: {}", chunkIds2);
 
             // 根据文件块ID获取文件及其内容片段
-            var fileWithChunks = kbFileService.getFileWithChunks(chunkIds2);
+//            var fileWithChunks = kbFileService.getFileWithChunks(chunkIds2);
 
+            var fileWithChunks = kbFileService.getFileWithChunksV2(chunkIds2);
 
             // 更新阶段信息，表示回答中
             response.setStage("回答中...");
@@ -269,7 +270,8 @@ public class LLMController {
                 // 根据用户的问题，搜索相关的文档片段
                 result2 = qdrantService.searchVector(qdrantService.getEmbedding(request.getQuestion()), topK);
                 List<Long> chunkIds2 = result2.stream().map(x -> x.getId().getNum()).toList();
-                var fileWithChunks = kbFileService.getFileWithChunks(chunkIds2);
+//                var fileWithChunks = kbFileService.getFileWithChunks(chunkIds2);
+                var fileWithChunks = kbFileService.getFileWithChunksV2(chunkIds2);
                 // 更新聊天响应的阶段信息，并发送到客户端
                 response.setStage("检索完成，问题回答中...");
                 SseUtil.sseSend(emitter, response);

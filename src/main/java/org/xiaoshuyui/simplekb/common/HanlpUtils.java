@@ -20,4 +20,9 @@ public class HanlpUtils {
 
         return wordList.stream().toList();
     }
+
+
+    public static String extractSummary(String text, int length){
+        return HanLP.getSummary(text, length);
+    }
 }
