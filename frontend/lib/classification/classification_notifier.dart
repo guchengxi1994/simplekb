@@ -24,7 +24,7 @@ class ClassificationNotifier
 
     if (types.success && types.data != null) {
       return ClassificationState(
-          nodes: types.data!.types
+          nodes: types.data!.typeSummaries
               .map((e) => ClassificationTreeNode(
                   name: e.name, count: e.fileCount, id: e.typeId))
               .toList());

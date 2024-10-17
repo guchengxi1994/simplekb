@@ -7,14 +7,14 @@ part of 'file_type_model.dart';
 // **************************************************************************
 
 FileTypeList _$FileTypeListFromJson(Map<String, dynamic> json) => FileTypeList(
-      types: (json['types'] as List<dynamic>)
+      typeSummaries: (json['typeSummaries'] as List<dynamic>)
           .map((e) => FileTypeModel.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
 
 Map<String, dynamic> _$FileTypeListToJson(FileTypeList instance) =>
     <String, dynamic>{
-      'types': instance.types,
+      'typeSummaries': instance.typeSummaries,
     };
 
 FileTypeModel _$FileTypeModelFromJson(Map<String, dynamic> json) =>

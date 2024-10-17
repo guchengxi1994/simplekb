@@ -21,7 +21,7 @@ public class CsvLoader {
      * @param stream 输入流，包含CSV数据
      * @param clazz  要映射的Java类，必须带有匹配CSV列的字段
      * @param <T>    泛型参数，表示要返回的列表的类型
-     * @return       成功时返回一个包含映射对象的列表，失败时返回null
+     * @return 成功时返回一个包含映射对象的列表，失败时返回null
      */
     public static <T> List<T> loadCsv(InputStream stream, Class<T> clazz) {
         InputStreamReader in = null;

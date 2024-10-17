@@ -1,5 +1,6 @@
 package org.xiaoshuyui.simplekb;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.MetadataMode;
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+@Slf4j
 @Configuration
 public class MultipleModelsConfig {
 
@@ -31,6 +33,8 @@ public class MultipleModelsConfig {
 
     @Bean(name = "defaultChat")
     public ChatClient defaultChatClient() {
+        log.info("Using model: {}", modelName);
+        log.info("Using base url: {}", url);
         OpenAiApi aiApi = new OpenAiApi(url, sk);
         ChatModel chatModel = new OpenAiChatModel(aiApi, OpenAiChatOptions.builder().withModel(modelName).build());
         return ChatClient.builder(chatModel).build();

@@ -12,6 +12,7 @@ import org.xiaoshuyui.simplekb.common.HanlpUtils;
 import org.xiaoshuyui.simplekb.common.Result;
 import org.xiaoshuyui.simplekb.common.SseUtil;
 import org.xiaoshuyui.simplekb.entity.request.ChatRequest;
+import org.xiaoshuyui.simplekb.entity.rerank.RerankRequest;
 import org.xiaoshuyui.simplekb.entity.response.*;
 import org.xiaoshuyui.simplekb.service.*;
 import reactor.core.Disposable;
@@ -26,19 +27,13 @@ import java.util.concurrent.Executors;
 @RequestMapping("/llm")
 public class LLMController {
 
-
     @Resource
     KbPromptService kbPromptService;
-
     @Resource
     KbFileService kbFileService;
-
     String questionRewriteTemplate = null;
-
     String rewriteResultToJsonTemplate = null;
-
     String chatDirectlyTemplate = null;
-
     String answerQuestionTemplate = """
             You are an expert AI assistant that explains your reasoning step by step. For each step, provide a title that describes what you're doing in that step, along with the content. Decide if you need another step or if you're ready to give the final answer. Respond in JSON format with 'title', 'content', and 'next_action' (either 'continue' or 'final_answer') keys. USE AS MANY REASONING STEPS AS POSSIBLE. AT LEAST 3. BE AWARE OF YOUR LIMITATIONS AS AN LLM AND WHAT YOU CAN AND CANNOT DO. IN YOUR REASONING, INCLUDE EXPLORATION OF ALTERNATIVE ANSWERS. CONSIDER YOU MAY BE WRONG, AND IF YOU ARE WRONG IN YOUR REASONING, WHERE IT WOULD BE. FULLY TEST ALL OTHER POSSIBILITIES. YOU CAN BE WRONG. WHEN YOU SAY YOU ARE RE-EXAMINING, ACTUALLY RE-EXAMINE, AND USE ANOTHER APPROACH TO DO SO. DO NOT JUST SAY YOU ARE RE-EXAMINING. USE AT LEAST 3 METHODS TO DERIVE THE ANSWER. USE BEST PRACTICES.
                         
@@ -57,7 +52,8 @@ public class LLMController {
             问题如下:
             {question}
             """;
-
+    @Value("${rerank.context-max-length}")
+    private int contextMaxLength;
     @Resource
     private QdrantService qdrantService;
     @Resource
@@ -279,9 +275,11 @@ public class LLMController {
                 SseUtil.sseSend(emitter, response);
                 StringBuffer sb = new StringBuffer();
                 // 使用模板和搜索到的文档片段，以及用户的问题，生成聊天回答的内容
-                var t = chatDirectlyTemplate.replace("{context}", fileWithChunksToString(fileWithChunks)).replace("{question}", request.getQuestion());
+                var r = fileWithChunksToList(fileWithChunks);
+                var t = chatDirectlyTemplate.replace("{context}", rerank(request.getQuestion(), r)).replace("{question}", request.getQuestion());
 
                 log.info("t===> \n" + t);
+
                 // 订阅LLM服务的流式回答，处理响应
                 response.setStage("回答中...");
                 Disposable disposable = llmService
@@ -355,7 +353,8 @@ public class LLMController {
                 SseUtil.sseSend(emitter, response);
                 StringBuffer sb = new StringBuffer();
                 // 使用模板和搜索到的文档片段，以及用户的问题，生成聊天回答的内容
-                var t = chatDirectlyTemplate.replace("{context}", fileWithChunksToString(fileWithChunks)).replace("{question}", request.getQuestion());
+                var r = fileWithChunksToList(fileWithChunks);
+                var t = chatDirectlyTemplate.replace("{context}", rerank(request.getQuestion(), r)).replace("{question}", request.getQuestion());
 
 //                log.info("t===>" + t);
                 // 订阅LLM服务的流式回答，处理响应
@@ -496,8 +495,9 @@ public class LLMController {
         return Result.OK("ok", kbFileChunkService.fullTextSearch(keywords));
     }
 
+    @Deprecated(since = "use `fileWithChunksToList` instead")
     String fileWithChunksToString(List<FileWithChunks> fileWithChunks) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int i = 1;
         for (var fileWithChunk : fileWithChunks) {
             for (var chunk : fileWithChunk.getChunks()) {
@@ -506,5 +506,62 @@ public class LLMController {
         }
 
         return sb.toString();
+    }
+
+    List<String> fileWithChunksToList(List<FileWithChunks> fileWithChunks) {
+        List<String> chunks = new ArrayList<>();
+        for (var fileWithChunk : fileWithChunks) {
+            for (var chunk : fileWithChunk.getChunks()) {
+                chunks.add(chunk);
+            }
+        }
+        return chunks;
+    }
+
+    String stringListToString(List<String> chunks) {
+        StringBuilder sb = new StringBuilder();
+        int i = 1;
+        for (var c : chunks) {
+            sb.append("第").append(i++).append("条信息：").append(c).append("\n\n");
+        }
+
+        return sb.toString();
+    }
+
+    String stringListToString(List<String> chunks, int maxLength) {
+        StringBuilder sb = new StringBuilder();
+        int i = 1;
+        for (var c : chunks) {
+            sb.append("第").append(i++).append("条信息：").append(c).append("\n\n");
+            if (sb.length() > maxLength) {
+                return sb.toString();
+            }
+        }
+
+        return sb.toString();
+    }
+
+    @PostMapping("/rerank")
+    @Deprecated(since = "for test")
+    public Result rerank(@RequestBody RerankRequest request) {
+        return Result.OK("ok", llmService.rerank(request));
+    }
+
+    String rerank(String query, List<String> documents) {
+        List<String> preResults = new ArrayList<>();
+        for (String document : documents) {
+            if (document.length() > contextMaxLength) {
+                continue;
+            }
+            preResults.add(document);
+        }
+
+        int totalLength = preResults.stream().mapToInt(String::length).sum();
+        if (totalLength <= contextMaxLength) {
+            return stringListToString(preResults);
+        }
+
+        var results = llmService.rerank(query, preResults);
+        return stringListToString(results, contextMaxLength);
     }
 }

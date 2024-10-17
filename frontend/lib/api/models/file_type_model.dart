@@ -4,10 +4,10 @@ part 'file_type_model.g.dart';
 
 @JsonSerializable()
 class FileTypeList {
-  final List<FileTypeModel> types;
+  final List<FileTypeModel> typeSummaries;
 
   FileTypeList({
-    required this.types,
+    required this.typeSummaries,
   });
 
   Map<String, dynamic> toJson() => _$FileTypeListToJson(this);

@@ -3,7 +3,6 @@ package org.xiaoshuyui.simplekb.entity.request;
 import com.opencsv.bean.CsvBindByName;
 import lombok.Data;
 import org.xiaoshuyui.simplekb.entity.response.UploadFileByTypeResponse;
-import org.xiaoshuyui.simplekb.service.KbFileTypeService;
 
 import java.util.LinkedHashMap;
 import java.util.List;

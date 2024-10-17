@@ -34,6 +34,6 @@ public interface KbFileMapper extends BaseMapper<KbFile> {
     FileWithKeywords getFileWithKeywordsById(@Param("fileId") Long fileId);
 
 
-    List<KbFileChunk> getFileByTypeId(@Param("typeId")Long typeId);
+    List<KbFileChunk> getFileByTypeId(@Param("typeId") Long typeId);
 }
 

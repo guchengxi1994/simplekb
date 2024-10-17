@@ -4,15 +4,20 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.xiaoshuyui.simplekb.HttpClient;
 import org.xiaoshuyui.simplekb.documentLoader.Loader;
 import org.xiaoshuyui.simplekb.entity.KbFileType;
+import org.xiaoshuyui.simplekb.entity.rerank.RerankRequest;
+import org.xiaoshuyui.simplekb.entity.rerank.RerankResponse;
 import org.xiaoshuyui.simplekb.mapper.KbFileTypeMapper;
 import reactor.core.publisher.Flux;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -21,10 +26,16 @@ public class LLMService {
 
     // 静态文件类型列表，避免重复初始化
     static List<KbFileType> types = null;
+    private final ChatClient defaultClient;
     @Resource
     KbPromptService kbPromptService;
     String prompt = null;
-    private ChatClient defaultClient;
+    @Value("${rerank.score-threshold}")
+    private double scoreThreshold;
+    @Value("${rerank.model}")
+    private String rerankModelName;
+    @Value("${rerank.host}")
+    private String rerankHost;
     @Resource
     private KbFileTypeMapper kbFileTypeMapper;
 
@@ -40,6 +51,45 @@ public class LLMService {
     // 构造函数，注入默认聊天客户端
     LLMService(@Qualifier("defaultChat") ChatClient defaultClient) {
         this.defaultClient = defaultClient;
+    }
+
+    public List<String> rerank(String query, List<String> documents) {
+        RerankRequest request = new RerankRequest();
+        request.setModel(rerankModelName);
+        request.setQuery(query);
+        request.setTopN(documents.size());
+        request.setDocuments(documents);
+        RerankResponse response = HttpClient.sendPostRequest(rerankHost, request, RerankResponse.class);
+        if (response == null) {
+            return new ArrayList<>();
+        }
+        var ids = response.getResults(scoreThreshold);
+        List<String> results = new ArrayList<>();
+        for (var id : ids) {
+            results.add(documents.get(id));
+        }
+
+        return results;
+
+    }
+
+
+    @Deprecated(since = "用于测试")
+    public List<String> rerank(RerankRequest request) {
+        if (request.getTopN() == 0) {
+            request.setTopN(3);
+        }
+        RerankResponse response = HttpClient.sendPostRequest(rerankHost, request, RerankResponse.class);
+        if (response == null) {
+            return new ArrayList<>();
+        }
+        var ids = response.getResults(scoreThreshold);
+        List<String> results = new ArrayList<>();
+        for (var id : ids) {
+            results.add(request.getDocuments().get(id));
+        }
+
+        return results;
     }
 
     // 处理文件上传的事务性方法

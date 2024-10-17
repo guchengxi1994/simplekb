@@ -27,21 +27,16 @@ import static io.qdrant.client.WithPayloadSelectorFactory.enable;
 @Component
 @Slf4j
 public class QdrantService {
+    private final EmbeddingModel embeddingModel;
     @Value("${qdrant.host}")
     private String host;
-
     @Value("${qdrant.port}")
     private int port;
-
     @Value("${qdrant.collection}")
     private String collection;
-
     @Value("${qdrant.vector-size}")
     private int vectorSize;
-
     private QdrantClient client;
-
-    private EmbeddingModel embeddingModel;
 
     QdrantService(@Qualifier("defaultEmbedding") EmbeddingModel embeddingModel) {
         this.embeddingModel = embeddingModel;
