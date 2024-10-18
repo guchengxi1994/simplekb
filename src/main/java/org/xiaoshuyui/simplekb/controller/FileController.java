@@ -1,5 +1,6 @@
 package org.xiaoshuyui.simplekb.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -170,6 +171,7 @@ public class FileController {
      * @return 返回一个SseEmitter对象，用于服务器发送事件给客户端
      */
     @PostMapping("/upload-by-type/stream")
+    @Operation(summary = "使用流方式按类型上传文件，仅用于快速上传数据库，在生产过程中谨慎使用")
     public SseEmitter uploadStream(@RequestParam("file") MultipartFile file) {
         // 创建一个新的SseEmitter实例，用于发送服务器事件
         SseEmitter emitter = new SseEmitter();

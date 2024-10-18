@@ -61,5 +61,10 @@ public class KbFileChunkKeywordsService extends ServiceImpl<KbFileChunkKeywordsM
     public void saveKeywords(List<KbFileChunkKeywords> keywords) {
         this.saveBatch(keywords);
     }
+
+
+    public List<String> getKeywordsByChunkId(Long chunkId) {
+        return kbFileChunkKeywordsMapper.getKeywordsByChunkId(chunkId);
+    }
 }
 

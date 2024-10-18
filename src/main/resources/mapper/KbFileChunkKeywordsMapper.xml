@@ -42,4 +42,10 @@
             #{keyword}
         </foreach>
     </select>
+
+    <select id="getKeywordsByChunkId" resultType="java.lang.String">
+        SELECT keyword
+        FROM kb_file_chunk_keywords
+        WHERE chunk_id = #{chunkId}
+    </select>
 </mapper>

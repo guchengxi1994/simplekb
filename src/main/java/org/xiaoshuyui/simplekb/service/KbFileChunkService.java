@@ -37,7 +37,7 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
      * @param keywords 关键字列表
      * @return 保存的分块ID
      */
-    public Long saveChunkAndKeywords(Long fileId, String content, List<String> keywords) {
+    public KbFileChunk saveChunkAndKeywords(Long fileId, String content, List<String> keywords) {
         KbFileChunk chunk = new KbFileChunk();
         chunk.setFileId(fileId);
         chunk.setContent(content);
@@ -50,7 +50,7 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
             keywordsList.add(kbFileChunkKeywords);
         }
         kbFileChunkKeywordsService.saveKeywords(keywordsList);
-        return chunk.getId();
+        return chunk;
     }
 
     /**

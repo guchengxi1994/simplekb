@@ -30,6 +30,9 @@ public class KbFileService {
     @Resource
     private QdrantService qdrantService;
 
+    @Resource
+    private KbFileChunkKeywordsService kbFileChunkKeywordsService;
+
     /**
      * 创建新文件
      *
@@ -57,8 +60,8 @@ public class KbFileService {
         List<String> lines = request.getChunks().stream().map(chunk -> chunk.get("content").toString()).toList();
         List<List<String>> keywords = request.getChunks().stream().map(chunk -> chunk.get("keywords")).map(keyword -> (List<String>) keyword).toList();
         for (int i = 0; i < lines.size(); i++) {
-            var chunkId = kbFileChunkService.saveChunkAndKeywords(fileId, lines.get(i), keywords.get(i));
-            qdrantService.insertVectorInString(chunkId, lines.get(i));
+            var chunk = kbFileChunkService.saveChunkAndKeywords(fileId, lines.get(i), keywords.get(i));
+            qdrantService.insertVectorInString(chunk.getId(), chunk.getContent() + lines.get(i));
             log.info("chunk " + i + " inserted");
         }
     }
@@ -137,6 +140,11 @@ public class KbFileService {
         List<FileWithChunks> files = kbFileMapper.getFileBasicInfo(fileIds);
         List<KbFileChunk> chunks = kbFileMapper.getFileChunksByFileIdsAndChunkIds(fileIds, chunkIds);
 
+        for (KbFileChunk chunk : chunks) {
+            var keywords = kbFileChunkKeywordsService.getKeywordsByChunkId(chunk.getId());
+            chunk.setKeywords(keywords);
+        }
+
         // 遍历文件列表，为每个文件设置其对应的分块信息
         for (FileWithChunks file : files) {
             // 过滤出属于当前文件的分块
@@ -149,7 +157,7 @@ public class KbFileService {
         }
 
         // 返回包含文件和分块信息的列表
-        return kbFileMapper.getFileWithChunks(chunkIds);
+        return files;
     }
 }
 

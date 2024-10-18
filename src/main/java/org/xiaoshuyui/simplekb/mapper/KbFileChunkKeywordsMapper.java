@@ -27,5 +27,8 @@ public interface KbFileChunkKeywordsMapper extends BaseMapper<KbFileChunkKeyword
      * @return 包含关键字的文件列表
      */
     List<FileWithKeywords> getFileWithKeywords(@Param("keywords") List<String> keywords);
+
+
+    List<String> getKeywordsByChunkId(@Param("chunkId") Long chunkId);
 }
 

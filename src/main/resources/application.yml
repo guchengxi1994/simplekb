@@ -56,7 +56,7 @@ qdrant:
 
 chunk:
   max-length: 500
-  top-k: 20
+  top-k: 10
 
 filelist:
   page-size: 5
