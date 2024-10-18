@@ -81,7 +81,7 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
      * @param contents 分块内容列表
      * @return 插入是否成功
      */
-    public boolean insert(Long fileId, List<Section> contents) {
+    public boolean insert(Long fileId, String fileName, List<Section> contents) {
         List<KbFileChunk> chunks = new ArrayList<>();
         for (Section content : contents) {
             KbFileChunk chunk = new KbFileChunk();
@@ -94,7 +94,7 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
 
         for (KbFileChunk chunk : chunks) {
             try {
-                qdrantService.insertVectorInString(chunk.getId(), chunk.getContent());
+                qdrantService.insertVectorInString(chunk.getId(), chunk.getContent(), fileId, fileName);
             } catch (Exception e) {
                 return false;
             }
@@ -108,7 +108,7 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
      * @param fileId   文件ID
      * @param contents 分块内容列表
      * @return 插入是否成功
-     * @deprecated 使用 {@link #insert(Long, List)} 替代
+     * @deprecated 使用 {@link #insert(Long, String, List)} 替代
      */
     @Deprecated
     public boolean insertInStringList(Long fileId, List<String> contents) {

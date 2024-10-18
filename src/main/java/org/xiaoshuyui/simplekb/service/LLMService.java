@@ -135,7 +135,7 @@ public class LLMService {
 
             log.info("sections: {}", sections);
             // 将文件分块插入知识库
-            if (!kbFileChunkService.insert(fileId, sections.getSections())) {
+            if (!kbFileChunkService.insert(fileId, file.getOriginalFilename(), sections.getSections())) {
                 return -1;
             }
             // 插入向量数据库

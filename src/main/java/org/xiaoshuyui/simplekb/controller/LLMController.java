@@ -11,6 +11,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.xiaoshuyui.simplekb.common.HanlpUtils;
 import org.xiaoshuyui.simplekb.common.Result;
 import org.xiaoshuyui.simplekb.common.SseUtil;
+import org.xiaoshuyui.simplekb.entity.KbFile;
+import org.xiaoshuyui.simplekb.entity.KbFileChunk;
 import org.xiaoshuyui.simplekb.entity.request.ChatRequest;
 import org.xiaoshuyui.simplekb.entity.rerank.RerankRequest;
 import org.xiaoshuyui.simplekb.entity.response.*;
@@ -164,7 +166,7 @@ public class LLMController {
             var keywords = HanlpUtils.hanLPSegment(request.getQuestion());
 
             // 根据关键字在知识库中全文搜索，获取相关文件块ID
-            var chunkIds = kbFileChunkService.fullTextSearch(keywords).stream().map(x -> x.getId()).toList();
+            var chunkIds = kbFileChunkService.fullTextSearch(keywords).stream().map(KbFileChunk::getId).toList();
 
             // 如果没有找到相关文件块，通知客户端并完成SSE连接
             if (chunkIds.isEmpty()) {
@@ -180,7 +182,7 @@ public class LLMController {
             SseUtil.sseSend(emitter, response);
 
             // 使用Qdrant服务根据改写后的问题进行向量搜索，并限制返回结果数量
-            List<Points.ScoredPoint> result2 = null;
+            List<Points.ScoredPoint> result2;
             try {
                 result2 = qdrantService.searchVector(qdrantService.getEmbedding(result), topK, chunkIds);
             } catch (Exception e) {
@@ -262,7 +264,7 @@ public class LLMController {
         // 在单独的线程中执行聊天逻辑，以避免阻塞主线程
         Executors.newSingleThreadExecutor().submit(() -> {
             ChatResponse response = new ChatResponse();
-            List<Points.ScoredPoint> result2 = null;
+            List<Points.ScoredPoint> result2;
             try {
                 // 设置聊天响应的阶段信息，并发送到客户端
                 response.setStage("文档检索中...");
@@ -277,8 +279,8 @@ public class LLMController {
                 SseUtil.sseSend(emitter, response);
                 StringBuffer sb = new StringBuffer();
                 // 使用模板和搜索到的文档片段，以及用户的问题，生成聊天回答的内容
-                var r = fileWithChunksToList(fileWithChunks);
-                var t = chatDirectlyTemplate.replace("{context}", rerank(request.getQuestion(), r)).replace("{question}", request.getQuestion());
+                var r = extractChunks(fileWithChunks);
+                var t = chatDirectlyTemplate.replace("{context}", rerankChunks(request.getQuestion(), r)).replace("{question}", request.getQuestion());
 
                 log.info("t===> \n" + t);
 
@@ -340,15 +342,16 @@ public class LLMController {
         // 在单独的线程中执行聊天逻辑，以避免阻塞主线程
         Executors.newSingleThreadExecutor().submit(() -> {
             ChatResponse response = new ChatResponse();
-            List<Points.ScoredPoint> result2 = null;
+            List<Points.ScoredPoint> result2;
             try {
                 // 设置聊天响应的阶段信息，并发送到客户端
                 response.setStage("文档检索中...");
                 SseUtil.sseSend(emitter, response);
                 // 根据用户的问题，搜索相关的文档片段
-                result2 = qdrantService.searchVector(qdrantService.getEmbedding(request.getQuestion()), topK, chunks.stream().map(x -> x.getId()).toList());
+                result2 = qdrantService.searchVector(qdrantService.getEmbedding(request.getQuestion()), topK, chunks.stream().map(KbFileChunk::getId).toList());
                 List<Long> chunkIds2 = result2.stream().map(x -> x.getId().getNum()).toList();
                 log.info("chunkIds2===>" + chunkIds2);
+                /// TODO 这里的优化忘记修改了，应该使用 getFileWithChunksV2 的
                 var fileWithChunks = kbFileService.getFileWithChunks(chunkIds2);
                 // 更新聊天响应的阶段信息，并发送到客户端
                 response.setStage("检索完成，问题回答中...");
@@ -403,7 +406,7 @@ public class LLMController {
 
     @PostMapping("/insert")
     @Deprecated(since = "for test")
-    public Result insert(String vector) {
+    public Result insert(String ignore) {
         try {
             qdrantService.insertVector(1L, new float[]{1f, 2f});
             return Result.OK("ok");
@@ -513,9 +516,15 @@ public class LLMController {
     List<String> fileWithChunksToList(List<FileWithChunks> fileWithChunks) {
         List<String> chunks = new ArrayList<>();
         for (var fileWithChunk : fileWithChunks) {
-            for (var chunk : fileWithChunk.getChunks()) {
-                chunks.add(chunk);
-            }
+            chunks.addAll(fileWithChunk.getChunks());
+        }
+        return chunks;
+    }
+
+    List<KbFileChunk> extractChunks(List<KbFile> files) {
+        List<KbFileChunk> chunks = new ArrayList<>();
+        for (var file : files) {
+            chunks.addAll(file.getChunks());
         }
         return chunks;
     }
@@ -556,6 +565,24 @@ public class LLMController {
                 continue;
             }
             preResults.add(document);
+        }
+
+        int totalLength = preResults.stream().mapToInt(String::length).sum();
+        if (totalLength <= contextMaxLength) {
+            return stringListToString(preResults);
+        }
+
+        var results = llmService.rerank(query, preResults);
+        return stringListToString(results, contextMaxLength);
+    }
+
+    String rerankChunks(String query, List<KbFileChunk> chunks) {
+        List<String> preResults = new ArrayList<>();
+        for (KbFileChunk document : chunks) {
+            if (document.getContent().length() > contextMaxLength) {
+                continue;
+            }
+            preResults.add(document.getComment() + document.getContent());
         }
 
         int totalLength = preResults.stream().mapToInt(String::length).sum();

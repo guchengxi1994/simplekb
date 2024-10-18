@@ -61,7 +61,7 @@ public interface KbFileMapper extends BaseMapper<KbFile> {
      * <p>
      * [NOTICE] FOR TEST
      */
-    List<FileWithChunks> getFileBasicInfo(@Param("fileIds") List<Long> fileIds);
+    List<KbFile> getFileBasicInfo(@Param("fileIds") List<Long> fileIds);
 
     /**
      * 根据文件ID列表和分块ID列表获取文件分块信息

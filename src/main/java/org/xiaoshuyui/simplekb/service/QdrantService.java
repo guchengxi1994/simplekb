@@ -92,6 +92,29 @@ public class QdrantService {
         Points.UpdateResult ignore = getClient().upsertAsync(collection, Collections.singletonList(pointStruct)).get();
     }
 
+
+    public void insertVectorInString(long chunkId, String content, long fileId, String fileName) throws ExecutionException, InterruptedException {
+        // 创建一个HashMap来存储数据点的元数据信息
+        HashMap<String, JsonWithInt.Value> payload = new HashMap<>();
+        // 将文本块的ID以键值对的形式添加到元数据中
+        payload.put("chunk_id", value(chunkId));
+        payload.put("file_id", value(fileId));
+        payload.put("file_name", value(fileName));
+
+        // 获取文本内容的嵌入向量表示
+        var vector = getEmbedding(content);
+
+        // 构造一个Points.PointStruct对象，包含要插入的向量数据的ID和向量值
+        Points.PointStruct pointStruct = Points.PointStruct.newBuilder()
+                .setId(id(chunkId))
+                .putAllPayload(payload)
+                .setVectors(vectors(vector))
+                .build();
+
+        // 异步执行向量数据的插入操作，并等待操作完成
+        Points.UpdateResult ignore = getClient().upsertAsync(collection, Collections.singletonList(pointStruct)).get();
+    }
+
     /**
      * 将向量插入到指定的集合中
      * 此方法负责将一个向量数据插入到指定的集合中，它首先构造一个pointStruct对象，该对象包含了要插入的数据的所有必要信息，
@@ -105,6 +128,24 @@ public class QdrantService {
     public void insertVector(long chunkId, float[] vector) throws ExecutionException, InterruptedException {
         HashMap<String, JsonWithInt.Value> payload = new HashMap<>();
         payload.put("chunk_id", value(chunkId));
+
+        // 构造一个Points.PointStruct对象，包含要插入的向量数据的ID和向量值
+        Points.PointStruct pointStruct = Points.PointStruct.newBuilder()
+                .setId(id(chunkId))
+                .putAllPayload(payload)
+                .setVectors(vectors(vector))
+                .build();
+
+        // 异步执行向量数据的插入操作，并等待操作完成
+        Points.UpdateResult ignore = getClient().upsertAsync(collection, Collections.singletonList(pointStruct)).get();
+    }
+
+
+    public void insertVector(long chunkId, float[] vector, long fileId, String fileName) throws ExecutionException, InterruptedException {
+        HashMap<String, JsonWithInt.Value> payload = new HashMap<>();
+        payload.put("chunk_id", value(chunkId));
+        payload.put("file_id", value(fileId));
+        payload.put("file_name", value(fileName));
 
         // 构造一个Points.PointStruct对象，包含要插入的向量数据的ID和向量值
         Points.PointStruct pointStruct = Points.PointStruct.newBuilder()
