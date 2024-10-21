@@ -48,8 +48,8 @@ public class KbFileChunk {
     // 为了提高embedding和rerank的检索准确率，在存储embedding结果时，添加一个
     // 以关键字为主的介绍字段
     // 形如：以下文本与关键字1,关键字2有关：\n
-    public String getComment(){
-        if (keywords!=null && !keywords.isEmpty()){
+    public String getComment() {
+        if (keywords != null && !keywords.isEmpty()) {
             return "以下文本与" + String.join(",", keywords) + "有关：\n";
         }
         /// TODO 待完善，这里要根据用户自定义关键字结合hanlp做分词

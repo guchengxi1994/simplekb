@@ -3,7 +3,7 @@ package org.xiaoshuyui.simplekb.documentLoader;
 import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.xiaoshuyui.simplekb.common.StringUtils;
+import org.xiaoshuyui.simplekb.common.utils.StringUtils;
 import org.xiaoshuyui.simplekb.documentLoader.result.Result;
 import org.xiaoshuyui.simplekb.documentLoader.result.Section;
 

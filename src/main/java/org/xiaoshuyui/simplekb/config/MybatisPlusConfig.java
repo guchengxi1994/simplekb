@@ -1,4 +1,4 @@
-package org.xiaoshuyui.simplekb;
+package org.xiaoshuyui.simplekb.config;
 
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;

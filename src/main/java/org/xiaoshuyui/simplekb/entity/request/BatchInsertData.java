@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 @Data
-public class CsvData {
+public class BatchInsertData {
 
     @CsvBindByName(column = "title")
     String title;

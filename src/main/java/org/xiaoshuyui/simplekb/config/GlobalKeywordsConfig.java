@@ -1,4 +1,4 @@
-package org.xiaoshuyui.simplekb;
+package org.xiaoshuyui.simplekb.config;
 
 import java.util.List;
 import java.util.Set;

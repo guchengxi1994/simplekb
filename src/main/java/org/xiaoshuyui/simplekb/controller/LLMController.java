@@ -8,9 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.xiaoshuyui.simplekb.common.HanlpUtils;
 import org.xiaoshuyui.simplekb.common.Result;
-import org.xiaoshuyui.simplekb.common.SseUtil;
+import org.xiaoshuyui.simplekb.common.utils.HanlpUtils;
+import org.xiaoshuyui.simplekb.common.utils.SseUtil;
 import org.xiaoshuyui.simplekb.entity.KbFile;
 import org.xiaoshuyui.simplekb.entity.KbFileChunk;
 import org.xiaoshuyui.simplekb.entity.request.ChatRequest;
@@ -271,6 +271,10 @@ public class LLMController {
                 SseUtil.sseSend(emitter, response);
                 // 根据用户的问题，搜索相关的文档片段
                 result2 = qdrantService.searchVector(qdrantService.getEmbedding(request.getQuestion()), topK);
+                for (var x : result2) {
+                    log.info("score {}", x.getScore());
+                }
+
                 List<Long> chunkIds2 = result2.stream().map(x -> x.getId().getNum()).toList();
 //                var fileWithChunks = kbFileService.getFileWithChunks(chunkIds2);
                 var fileWithChunks = kbFileService.getFileWithChunksV2(chunkIds2);
@@ -313,6 +317,7 @@ public class LLMController {
                     }
                 });
             } catch (Exception e) {
+                log.error("error===> \n" + e.getMessage());
                 // 异常处理，如果在处理请求过程中发生异常，发送异常信息到客户端，并完成SSE连接
                 response.setStage("");
                 response.setContent("查询相关条目异常。");

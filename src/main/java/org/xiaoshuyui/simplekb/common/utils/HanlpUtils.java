@@ -1,4 +1,4 @@
-package org.xiaoshuyui.simplekb.common;
+package org.xiaoshuyui.simplekb.common.utils;
 
 import com.hankcs.hanlp.HanLP;
 import com.hankcs.hanlp.corpus.tag.Nature;
@@ -22,7 +22,7 @@ public class HanlpUtils {
     }
 
 
-    public static String extractSummary(String text, int length){
+    public static String extractSummary(String text, int length) {
         return HanLP.getSummary(text, length);
     }
 }

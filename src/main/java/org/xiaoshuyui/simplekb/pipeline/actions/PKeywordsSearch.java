@@ -2,9 +2,9 @@ package org.xiaoshuyui.simplekb.pipeline.actions;
 
 import io.qdrant.client.grpc.Points;
 import lombok.extern.slf4j.Slf4j;
-import org.xiaoshuyui.simplekb.AppConfig;
 import org.xiaoshuyui.simplekb.SpringContextUtil;
-import org.xiaoshuyui.simplekb.common.HanlpUtils;
+import org.xiaoshuyui.simplekb.common.utils.HanlpUtils;
+import org.xiaoshuyui.simplekb.config.AppConfig;
 import org.xiaoshuyui.simplekb.pipeline.output.KbQueryOutput;
 import org.xiaoshuyui.simplekb.service.KbFileChunkService;
 import org.xiaoshuyui.simplekb.service.QdrantService;

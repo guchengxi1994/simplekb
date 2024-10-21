@@ -1,4 +1,4 @@
-package org.xiaoshuyui.simplekb.common;
+package org.xiaoshuyui.simplekb.common.batchInsert;
 
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;

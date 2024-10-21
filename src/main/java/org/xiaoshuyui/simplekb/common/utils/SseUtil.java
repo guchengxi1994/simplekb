@@ -1,4 +1,4 @@
-package org.xiaoshuyui.simplekb.common;
+package org.xiaoshuyui.simplekb.common.utils;
 
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;

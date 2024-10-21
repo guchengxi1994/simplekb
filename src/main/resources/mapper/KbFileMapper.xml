@@ -91,7 +91,7 @@
     <resultMap id="FileBasic" type="org.xiaoshuyui.simplekb.entity.KbFile">
         <id column="kb_file_id" property="id"/>
         <result property="name" column="kb_file_name"/>
-        <result property="type" column="type_name"/>
+        <result property="typeName" column="type_name"/>
     </resultMap>
 
 

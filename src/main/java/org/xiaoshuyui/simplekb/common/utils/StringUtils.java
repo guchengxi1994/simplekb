@@ -1,4 +1,4 @@
-package org.xiaoshuyui.simplekb.common;
+package org.xiaoshuyui.simplekb.common.utils;
 
 import java.util.ArrayList;
 import java.util.List;

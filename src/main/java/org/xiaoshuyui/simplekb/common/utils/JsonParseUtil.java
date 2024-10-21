@@ -1,4 +1,4 @@
-package org.xiaoshuyui.simplekb.common;
+package org.xiaoshuyui.simplekb.common.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

@@ -44,6 +44,7 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
         kbFileChunkMapper.insert(chunk);
         List<KbFileChunkKeywords> keywordsList = new ArrayList<>();
         for (String keyword : keywords) {
+            if (keyword.trim().isEmpty()) continue;
             KbFileChunkKeywords kbFileChunkKeywords = new KbFileChunkKeywords();
             kbFileChunkKeywords.setChunkId(chunk.getId());
             kbFileChunkKeywords.setKeyword(keyword);

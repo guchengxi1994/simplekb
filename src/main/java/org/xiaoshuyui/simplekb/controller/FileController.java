@@ -8,14 +8,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.xiaoshuyui.simplekb.common.CsvLoader;
 import org.xiaoshuyui.simplekb.common.Result;
-import org.xiaoshuyui.simplekb.common.SseUtil;
-import org.xiaoshuyui.simplekb.common.StringUtils;
+import org.xiaoshuyui.simplekb.common.batchInsert.CsvLoader;
+import org.xiaoshuyui.simplekb.common.batchInsert.XlsxLoader;
+import org.xiaoshuyui.simplekb.common.utils.SseUtil;
+import org.xiaoshuyui.simplekb.common.utils.StringUtils;
 import org.xiaoshuyui.simplekb.documentLoader.CommonLoader;
 import org.xiaoshuyui.simplekb.documentLoader.DocumentParser;
 import org.xiaoshuyui.simplekb.documentLoader.TitlePatternManager;
-import org.xiaoshuyui.simplekb.entity.request.CsvData;
+import org.xiaoshuyui.simplekb.entity.request.BatchInsertData;
 import org.xiaoshuyui.simplekb.entity.response.UploadFileByTypeResponse;
 import org.xiaoshuyui.simplekb.mapper.KbFileChunkKeywordsMapper;
 import org.xiaoshuyui.simplekb.service.KbFileService;
@@ -182,11 +183,19 @@ public class FileController {
             SseUtil.sseSend(emitter, "读取文件中...");
 
             try {
-                // 使用CsvLoader从文件输入流中加载CSV数据，转换为CsvData对象列表
-                List<CsvData> dataList = CsvLoader.loadCsv(file.getInputStream(), CsvData.class);
+                List<BatchInsertData> dataList;
+                if (file.getOriginalFilename().endsWith(".xlsx")) {
+                    dataList = XlsxLoader.loadXlsx(file.getInputStream(), BatchInsertData.class);
+                } else {
+                    dataList = CsvLoader.loadCsv(file.getInputStream(), BatchInsertData.class);
+                }
+                log.info("读取到" + dataList.size() + "条数据");
 
                 // 遍历CsvData列表，处理每个数据项
-                for (CsvData data : dataList) {
+                for (BatchInsertData data : dataList) {
+                    if (data.getTitle() == null || data.getContent() == null) {
+                        continue;
+                    }
                     // 发送当前处理的CsvData标题
                     SseUtil.sseSend(emitter, "正在处理：" + data.getTitle());
 
@@ -209,6 +218,7 @@ public class FileController {
                 emitter.complete();
 
             } catch (Exception e) {
+                log.error("Read error: " + e.getMessage());
                 // 捕获异常，并发送文件读取失败的消息
                 SseUtil.sseSend(emitter, "读取文件失败");
 
