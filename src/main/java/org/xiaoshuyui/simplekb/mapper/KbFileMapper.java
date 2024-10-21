@@ -5,7 +5,6 @@ import org.apache.ibatis.annotations.Param;
 import org.xiaoshuyui.simplekb.entity.KbFile;
 import org.xiaoshuyui.simplekb.entity.KbFileChunk;
 import org.xiaoshuyui.simplekb.entity.response.FileWithChunks;
-import org.xiaoshuyui.simplekb.entity.response.FileWithKeywords;
 
 import java.util.List;
 
@@ -31,7 +30,7 @@ public interface KbFileMapper extends BaseMapper<KbFile> {
      * @param fileId 文件ID，用于指定需要查询的文件
      * @return 包含文件及其关键词信息的对象
      */
-    FileWithKeywords getFileWithKeywordsById(@Param("fileId") Long fileId);
+    KbFile getFileWithKeywordsById(@Param("fileId") Long fileId);
 
 
     List<KbFileChunk> getFileByTypeId(@Param("typeId") Long typeId);

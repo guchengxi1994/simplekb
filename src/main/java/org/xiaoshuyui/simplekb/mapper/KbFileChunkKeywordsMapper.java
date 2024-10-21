@@ -2,8 +2,8 @@ package org.xiaoshuyui.simplekb.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
+import org.xiaoshuyui.simplekb.entity.KbFile;
 import org.xiaoshuyui.simplekb.entity.KbFileChunkKeywords;
-import org.xiaoshuyui.simplekb.entity.response.FileWithKeywords;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ public interface KbFileChunkKeywordsMapper extends BaseMapper<KbFileChunkKeyword
      * @param keywords 关键字列表，用于查询包含这些关键字的文件
      * @return 包含关键字的文件列表
      */
-    List<FileWithKeywords> getFileWithKeywords(@Param("keywords") List<String> keywords);
+    List<KbFile> getFileWithKeywords(@Param("keywords") List<String> keywords);
 
 
     List<String> getKeywordsByChunkId(@Param("chunkId") Long chunkId);

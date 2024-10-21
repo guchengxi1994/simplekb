@@ -6,8 +6,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.xiaoshuyui.simplekb.config.GlobalKeywordsConfig;
+import org.xiaoshuyui.simplekb.entity.KbFile;
 import org.xiaoshuyui.simplekb.entity.KbFileChunkKeywords;
-import org.xiaoshuyui.simplekb.entity.response.FileWithKeywords;
 import org.xiaoshuyui.simplekb.mapper.KbFileChunkKeywordsMapper;
 
 import java.util.List;
@@ -49,7 +49,7 @@ public class KbFileChunkKeywordsService extends ServiceImpl<KbFileChunkKeywordsM
      * @param keywords 关键字列表
      * @return 包含文件和关键字信息的列表
      */
-    public List<FileWithKeywords> getFileWithKeywords(List<String> keywords) {
+    public List<KbFile> getFileWithKeywords(List<String> keywords) {
         return kbFileChunkKeywordsMapper.getFileWithKeywords(keywords);
     }
 

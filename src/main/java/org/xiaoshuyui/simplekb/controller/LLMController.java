@@ -357,14 +357,14 @@ public class LLMController {
                 List<Long> chunkIds2 = result2.stream().map(x -> x.getId().getNum()).toList();
                 log.info("chunkIds2===>" + chunkIds2);
                 /// TODO 这里的优化忘记修改了，应该使用 getFileWithChunksV2 的
-                var fileWithChunks = kbFileService.getFileWithChunks(chunkIds2);
+                var fileWithChunks = kbFileService.getFileWithChunksV2(chunkIds2);
                 // 更新聊天响应的阶段信息，并发送到客户端
                 response.setStage("检索完成，问题回答中...");
                 SseUtil.sseSend(emitter, response);
                 StringBuffer sb = new StringBuffer();
                 // 使用模板和搜索到的文档片段，以及用户的问题，生成聊天回答的内容
-                var r = fileWithChunksToList(fileWithChunks);
-                var t = chatDirectlyTemplate.replace("{context}", rerank(request.getQuestion(), r)).replace("{question}", request.getQuestion());
+                var r = extractChunks(fileWithChunks);
+                var t = chatDirectlyTemplate.replace("{context}", rerankChunks(request.getQuestion(), r)).replace("{question}", request.getQuestion());
 
 //                log.info("t===>" + t);
                 // 订阅LLM服务的流式回答，处理响应

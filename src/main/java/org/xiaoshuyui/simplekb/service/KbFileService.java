@@ -10,8 +10,6 @@ import org.xiaoshuyui.simplekb.decoration.TimeIt;
 import org.xiaoshuyui.simplekb.entity.KbFile;
 import org.xiaoshuyui.simplekb.entity.KbFileChunk;
 import org.xiaoshuyui.simplekb.entity.response.FileList;
-import org.xiaoshuyui.simplekb.entity.response.FileWithChunks;
-import org.xiaoshuyui.simplekb.entity.response.FileWithKeywords;
 import org.xiaoshuyui.simplekb.entity.response.UploadFileByTypeResponse;
 import org.xiaoshuyui.simplekb.mapper.KbFileMapper;
 
@@ -66,16 +64,6 @@ public class KbFileService {
         }
     }
 
-    /**
-     * 根据分块ID获取文件及其分块信息
-     *
-     * @param chunkIds 分块ID列表
-     * @return 包含文件和分块信息的列表
-     */
-    @TimeIt
-    public List<FileWithChunks> getFileWithChunks(List<Long> chunkIds) {
-        return kbFileMapper.getFileWithChunks(chunkIds);
-    }
 
     /**
      * 根据文件ID获取文件及其关键词信息
@@ -83,7 +71,7 @@ public class KbFileService {
      * @param fileId 文件ID
      * @return 包含文件和关键词信息的对象
      */
-    public FileWithKeywords getFileWithKeywordsById(Long fileId) {
+    public KbFile getFileWithKeywordsById(Long fileId) {
         return kbFileMapper.getFileWithKeywordsById(fileId);
     }
 
@@ -106,9 +94,9 @@ public class KbFileService {
         IPage<KbFile> parentPage = kbFileMapper.selectPage(page, new QueryWrapper<KbFile>().eq("kb_file_type", type));
 
         parentPage.getRecords().forEach(parent -> {
-            FileWithKeywords fullParent = kbFileMapper.getFileWithKeywordsById(parent.getId());
-            parent.setChunks(fullParent.toKbFileChunks());
-            parent.setTypeName(fullParent.getType());
+            KbFile fullParent = kbFileMapper.getFileWithKeywordsById(parent.getId());
+            parent.setChunks(fullParent.getChunks());
+            parent.setTypeName(fullParent.getTypeName());
         });
         FileList fileList = new FileList();
         fileList.setFiles(parentPage.getRecords());
