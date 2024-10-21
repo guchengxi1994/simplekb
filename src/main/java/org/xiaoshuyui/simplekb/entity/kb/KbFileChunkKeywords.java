@@ -1,4 +1,4 @@
-package org.xiaoshuyui.simplekb.entity;
+package org.xiaoshuyui.simplekb.entity.kb;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;

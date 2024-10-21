@@ -1,4 +1,4 @@
-package org.xiaoshuyui.simplekb.common;
+package org.xiaoshuyui.simplekb.common.response;
 
 public interface CommonConstants {
     /**

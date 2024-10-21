@@ -2,8 +2,8 @@ package org.xiaoshuyui.simplekb.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
-import org.xiaoshuyui.simplekb.entity.KbFile;
-import org.xiaoshuyui.simplekb.entity.KbFileChunkKeywords;
+import org.xiaoshuyui.simplekb.entity.kb.KbFile;
+import org.xiaoshuyui.simplekb.entity.kb.KbFileChunkKeywords;
 
 import java.util.List;
 

@@ -2,7 +2,7 @@ package org.xiaoshuyui.simplekb.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.xiaoshuyui.simplekb.entity.KbPrompt;
+import org.xiaoshuyui.simplekb.entity.kb.KbPrompt;
 
 import java.util.List;
 

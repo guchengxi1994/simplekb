@@ -6,8 +6,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.xiaoshuyui.simplekb.config.GlobalKeywordsConfig;
-import org.xiaoshuyui.simplekb.entity.KbFile;
-import org.xiaoshuyui.simplekb.entity.KbFileChunkKeywords;
+import org.xiaoshuyui.simplekb.entity.kb.KbFile;
+import org.xiaoshuyui.simplekb.entity.kb.KbFileChunkKeywords;
 import org.xiaoshuyui.simplekb.mapper.KbFileChunkKeywordsMapper;
 
 import java.util.List;

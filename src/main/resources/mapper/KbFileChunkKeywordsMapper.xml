@@ -8,7 +8,7 @@
         FROM kb_file_chunk_keywords
     </select>
 
-    <resultMap id="ChunkWithKeywordsResultMap" type="org.xiaoshuyui.simplekb.entity.KbFileChunk">
+    <resultMap id="ChunkWithKeywordsResultMap" type="org.xiaoshuyui.simplekb.entity.kb.KbFileChunk">
         <id column="content" property="content"/>
         <result column="chunkId" property="id"/>
         <collection property="keywords" ofType="java.lang.String">
@@ -16,11 +16,11 @@
         </collection>
     </resultMap>
 
-    <resultMap id="FileWithKeywordsResultMap" type="org.xiaoshuyui.simplekb.entity.KbFile">
+    <resultMap id="FileWithKeywordsResultMap" type="org.xiaoshuyui.simplekb.entity.kb.KbFile">
         <id column="fileId" property="id"/>
         <result column="name" property="name"/>
         <result column="type" property="typeName"/>
-        <collection property="chunks" ofType="org.xiaoshuyui.simplekb.entity.KbFileChunk"
+        <collection property="chunks" ofType="org.xiaoshuyui.simplekb.entity.kb.KbFileChunk"
                     resultMap="ChunkWithKeywordsResultMap"/>
     </resultMap>
 

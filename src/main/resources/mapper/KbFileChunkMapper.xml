@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.xiaoshuyui.simplekb.mapper.KbFileChunkMapper">
 
-    <resultMap id="kbFileChunkResultMap" type="org.xiaoshuyui.simplekb.entity.KbFileChunk">
+    <resultMap id="kbFileChunkResultMap" type="org.xiaoshuyui.simplekb.entity.kb.KbFileChunk">
         <id property="id" column="chunk_id"/>
         <result property="fileId" column="file_id"/>
         <result property="content" column="chunk_content"/>

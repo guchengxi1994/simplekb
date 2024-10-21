@@ -1,7 +1,7 @@
 package org.xiaoshuyui.simplekb.service;
 
 import org.springframework.stereotype.Service;
-import org.xiaoshuyui.simplekb.entity.KbPrompt;
+import org.xiaoshuyui.simplekb.entity.kb.KbPrompt;
 import org.xiaoshuyui.simplekb.mapper.KbPromptMapper;
 
 import java.util.List;

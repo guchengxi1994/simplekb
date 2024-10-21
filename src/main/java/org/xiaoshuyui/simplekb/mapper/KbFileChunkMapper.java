@@ -1,7 +1,7 @@
 package org.xiaoshuyui.simplekb.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import org.xiaoshuyui.simplekb.entity.KbFileChunk;
+import org.xiaoshuyui.simplekb.entity.kb.KbFileChunk;
 
 import java.util.List;
 import java.util.Map;

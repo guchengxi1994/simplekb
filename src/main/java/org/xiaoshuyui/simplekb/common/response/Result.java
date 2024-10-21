@@ -1,15 +1,17 @@
-package org.xiaoshuyui.simplekb.common;
+package org.xiaoshuyui.simplekb.common.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 @Data
 @Schema(name = "接口返回对象", description = "接口返回对象")
 public class Result<T> implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -29,13 +31,6 @@ public class Result<T> implements Serializable {
      */
     @Schema(name = "code")
     private Integer code = 0;
-
-    /**
-     * 返回数据对象 data
-     */
-    @Deprecated(since = "use `data` instead")
-    @Schema(name = "result")
-    private T result;
 
     /**
      * 返回数据对象 data
@@ -72,14 +67,6 @@ public class Result<T> implements Serializable {
         return r;
     }
 
-    @Deprecated
-    public static Result<Object> ok(Object data) {
-        Result<Object> r = new Result<Object>();
-        r.setSuccess(true);
-        r.setCode(CommonConstants.SC_OK_200);
-        r.setResult(data);
-        return r;
-    }
 
     public static <T> Result<T> OK() {
         Result<T> r = new Result<T>();
@@ -89,13 +76,6 @@ public class Result<T> implements Serializable {
         return r;
     }
 
-    public static <T> Result<T> OK(T data) {
-        Result<T> r = new Result<T>();
-        r.setSuccess(true);
-        r.setCode(CommonConstants.SC_OK_200);
-        r.setResult(data);
-        return r;
-    }
 
     public static <T> Result<T> OK_data(T data) {
         Result<T> r = new Result<T>();
@@ -106,14 +86,6 @@ public class Result<T> implements Serializable {
         return r;
     }
 
-    public static <T> Result<T> OK(String msg, T data) {
-        Result<T> r = new Result<T>();
-        r.setSuccess(true);
-        r.setCode(CommonConstants.SC_OK_200);
-        r.setMessage(msg);
-        r.setResult(data);
-        return r;
-    }
 
     public static Result<Object> error(String msg) {
         return error(CommonConstants.SC_INTERNAL_SERVER_ERROR_500, msg);

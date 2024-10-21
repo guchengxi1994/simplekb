@@ -8,14 +8,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.xiaoshuyui.simplekb.common.Result;
+import org.xiaoshuyui.simplekb.common.response.Result;
 import org.xiaoshuyui.simplekb.common.utils.HanlpUtils;
 import org.xiaoshuyui.simplekb.common.utils.SseUtil;
-import org.xiaoshuyui.simplekb.entity.KbFile;
-import org.xiaoshuyui.simplekb.entity.KbFileChunk;
+import org.xiaoshuyui.simplekb.entity.kb.KbFile;
+import org.xiaoshuyui.simplekb.entity.kb.KbFileChunk;
 import org.xiaoshuyui.simplekb.entity.request.ChatRequest;
 import org.xiaoshuyui.simplekb.entity.rerank.RerankRequest;
-import org.xiaoshuyui.simplekb.entity.response.*;
+import org.xiaoshuyui.simplekb.entity.response.ChatResponse;
+import org.xiaoshuyui.simplekb.entity.response.QuestionRewriteResponse;
+import org.xiaoshuyui.simplekb.entity.response.RefFile;
+import org.xiaoshuyui.simplekb.entity.response.UploadFileResponse;
 import org.xiaoshuyui.simplekb.service.*;
 import reactor.core.Disposable;
 
@@ -110,7 +113,7 @@ public class LLMController {
             var result = qdrantService.searchVector(vector, 3);
             List<Long> chunkIds = result.stream().map(x -> x.getPayloadMap().get("chunk_id").getIntegerValue()).toList();
 
-            return Result.OK("ok", chunkIds);
+            return Result.OK_data(chunkIds);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
@@ -414,7 +417,7 @@ public class LLMController {
     public Result insert(String ignore) {
         try {
             qdrantService.insertVector(1L, new float[]{1f, 2f});
-            return Result.OK("ok");
+            return Result.OK();
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
@@ -491,7 +494,7 @@ public class LLMController {
     public Result generate(@Param("text") String text) {
         try {
             var vector = qdrantService.getEmbedding(text);
-            return Result.OK("ok", vector);
+            return Result.OK_data(vector);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }
@@ -502,29 +505,9 @@ public class LLMController {
     public Result fulltext(@Param("content") String content) {
 
         var keywords = HanlpUtils.hanLPSegment(content);
-        return Result.OK("ok", kbFileChunkService.fullTextSearch(keywords));
+        return Result.OK_data(kbFileChunkService.fullTextSearch(keywords));
     }
 
-    @Deprecated(since = "use `fileWithChunksToList` instead")
-    String fileWithChunksToString(List<FileWithChunks> fileWithChunks) {
-        StringBuilder sb = new StringBuilder();
-        int i = 1;
-        for (var fileWithChunk : fileWithChunks) {
-            for (var chunk : fileWithChunk.getChunks()) {
-                sb.append("第").append(i++).append("条信息：").append(chunk).append("\n\n");
-            }
-        }
-
-        return sb.toString();
-    }
-
-    List<String> fileWithChunksToList(List<FileWithChunks> fileWithChunks) {
-        List<String> chunks = new ArrayList<>();
-        for (var fileWithChunk : fileWithChunks) {
-            chunks.addAll(fileWithChunk.getChunks());
-        }
-        return chunks;
-    }
 
     List<KbFileChunk> extractChunks(List<KbFile> files) {
         List<KbFileChunk> chunks = new ArrayList<>();
@@ -560,7 +543,7 @@ public class LLMController {
     @PostMapping("/rerank")
     @Deprecated(since = "for test")
     public Result rerank(@RequestBody RerankRequest request) {
-        return Result.OK("ok", llmService.rerank(request));
+        return Result.OK_data(llmService.rerank(request));
     }
 
     String rerank(String query, List<String> documents) {

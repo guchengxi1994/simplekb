@@ -8,14 +8,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.xiaoshuyui.simplekb.common.Result;
 import org.xiaoshuyui.simplekb.common.batchInsert.CsvLoader;
 import org.xiaoshuyui.simplekb.common.batchInsert.XlsxLoader;
+import org.xiaoshuyui.simplekb.common.response.Result;
 import org.xiaoshuyui.simplekb.common.utils.SseUtil;
 import org.xiaoshuyui.simplekb.common.utils.StringUtils;
 import org.xiaoshuyui.simplekb.documentLoader.CommonLoader;
 import org.xiaoshuyui.simplekb.documentLoader.DocumentParser;
 import org.xiaoshuyui.simplekb.documentLoader.TitlePatternManager;
+import org.xiaoshuyui.simplekb.documentLoader.result.Section;
 import org.xiaoshuyui.simplekb.entity.request.BatchInsertData;
 import org.xiaoshuyui.simplekb.entity.response.UploadFileByTypeResponse;
 import org.xiaoshuyui.simplekb.mapper.KbFileChunkKeywordsMapper;
@@ -157,7 +158,7 @@ public class FileController {
             // 调用文件服务进行上传处理
             kbFileService.uploadByType(request);
             log.info("成功上传文件：" + request.getFilename());
-            return Result.OK("成功");
+            return Result.OK();
         } catch (Exception e) {
             return Result.error("失败" + e.getMessage());
         }
@@ -182,6 +183,11 @@ public class FileController {
             // 通过SseEmitter发送消息，表示文件读取中
             SseUtil.sseSend(emitter, "读取文件中...");
 
+            if (file.getOriginalFilename() == null) {
+                SseUtil.sseSend(emitter, "文件名不能为空");
+                return;
+            }
+
             try {
                 List<BatchInsertData> dataList;
                 if (file.getOriginalFilename().endsWith(".xlsx")) {
@@ -189,6 +195,11 @@ public class FileController {
                 } else {
                     dataList = CsvLoader.loadCsv(file.getInputStream(), BatchInsertData.class);
                 }
+                if (dataList == null || dataList.isEmpty()) {
+                    SseUtil.sseSend(emitter, "文件读取异常");
+                    return;
+                }
+
                 log.info("读取到" + dataList.size() + "条数据");
 
                 // 遍历CsvData列表，处理每个数据项
@@ -251,7 +262,7 @@ public class FileController {
         } else {
             // 标题增强切分
             TitlePatternManager patternManager = new TitlePatternManager();
-            return DocumentParser.parseDocument(List.of(lines), patternManager).stream().map((v) -> v.getContent()).toList();
+            return DocumentParser.parseDocument(List.of(lines), patternManager).stream().map(Section::getContent).toList();
         }
     }
 

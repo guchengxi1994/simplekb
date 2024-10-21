@@ -7,7 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import org.xiaoshuyui.simplekb.common.Result;
+import org.xiaoshuyui.simplekb.common.response.Result;
 
 //@RestControllerAdvice
 @Slf4j

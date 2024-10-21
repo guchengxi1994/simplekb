@@ -2,9 +2,8 @@ package org.xiaoshuyui.simplekb.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
-import org.xiaoshuyui.simplekb.entity.KbFile;
-import org.xiaoshuyui.simplekb.entity.KbFileChunk;
-import org.xiaoshuyui.simplekb.entity.response.FileWithChunks;
+import org.xiaoshuyui.simplekb.entity.kb.KbFile;
+import org.xiaoshuyui.simplekb.entity.kb.KbFileChunk;
 
 import java.util.List;
 
@@ -21,7 +20,7 @@ public interface KbFileMapper extends BaseMapper<KbFile> {
      * @param chunkIds 分块ID列表，用于指定需要查询的文件分块
      * @return 包含文件及其分块信息的列表
      */
-    List<FileWithChunks> getFileWithChunks(@Param("chunkIds") List<Long> chunkIds);
+    List<KbFile> getFileWithChunks(@Param("chunkIds") List<Long> chunkIds);
 
     /**
      * 根据文件ID获取文件及其关联的关键词信息

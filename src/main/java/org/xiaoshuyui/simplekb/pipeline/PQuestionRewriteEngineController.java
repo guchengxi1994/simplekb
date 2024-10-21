@@ -13,7 +13,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xiaoshuyui.simplekb.SpringContextUtil;
-import org.xiaoshuyui.simplekb.common.Result;
+import org.xiaoshuyui.simplekb.common.response.Result;
 import org.xiaoshuyui.simplekb.common.utils.SseUtil;
 import org.xiaoshuyui.simplekb.pipeline.actions.Action;
 import org.xiaoshuyui.simplekb.pipeline.actions.PEndAction;

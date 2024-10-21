@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.xiaoshuyui.simplekb.documentLoader.result.Section;
-import org.xiaoshuyui.simplekb.entity.KbFileChunk;
-import org.xiaoshuyui.simplekb.entity.KbFileChunkKeywords;
+import org.xiaoshuyui.simplekb.entity.kb.KbFileChunk;
+import org.xiaoshuyui.simplekb.entity.kb.KbFileChunkKeywords;
 import org.xiaoshuyui.simplekb.mapper.KbFileChunkMapper;
 
 import java.util.ArrayList;

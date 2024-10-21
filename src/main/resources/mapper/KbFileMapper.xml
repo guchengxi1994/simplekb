@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.xiaoshuyui.simplekb.mapper.KbFileMapper">
 
-    <resultMap id="FileWithChunksResultMap" type="org.xiaoshuyui.simplekb.entity.response.FileWithChunks">
+    <resultMap id="FileWithChunksResultMap" type="org.xiaoshuyui.simplekb.entity.kb.KbFile">
         <id column="kb_file_id" property="id"/>
         <!-- Map file name -->
         <result property="name" column="kb_file_name"/>
@@ -36,7 +36,7 @@
     </select>
 
 
-    <resultMap id="ChunkWithKeywordsResultMap" type="org.xiaoshuyui.simplekb.entity.KbFileChunk">
+    <resultMap id="ChunkWithKeywordsResultMap" type="org.xiaoshuyui.simplekb.entity.kb.KbFileChunk">
         <id column="content" property="content"/>
         <result column="chunkId" property="id"/>
         <collection property="keywords" ofType="java.lang.String">
@@ -44,11 +44,11 @@
         </collection>
     </resultMap>
 
-    <resultMap id="FileWithKeywordsResultMap" type="org.xiaoshuyui.simplekb.entity.KbFile">
+    <resultMap id="FileWithKeywordsResultMap" type="org.xiaoshuyui.simplekb.entity.kb.KbFile">
         <id column="fileId" property="id"/>
         <result column="name" property="name"/>
         <result column="type" property="typeName"/>
-        <collection property="chunks" ofType="org.xiaoshuyui.simplekb.entity.KbFileChunk"
+        <collection property="chunks" ofType="org.xiaoshuyui.simplekb.entity.kb.KbFileChunk"
                     resultMap="ChunkWithKeywordsResultMap"/>
     </resultMap>
 
@@ -67,7 +67,7 @@
         where f.kb_file_id = #{fileId}
     </select>
 
-    <select id="getFileByTypeId" resultType="org.xiaoshuyui.simplekb.entity.KbFileChunk">
+    <select id="getFileByTypeId" resultType="org.xiaoshuyui.simplekb.entity.kb.KbFileChunk">
         SELECT fc.chunk_id AS id, fc.chunk_content AS content, fc.file_id as fileId
         from kb_file f
                  LEFT JOIN kb_file_chunk fc ON f.kb_file_id = fc.file_id
@@ -75,11 +75,11 @@
     </select>
 
 
-    <resultMap id="kbFileMap" type="org.xiaoshuyui.simplekb.entity.KbFile">
+    <resultMap id="kbFileMap" type="org.xiaoshuyui.simplekb.entity.kb.KbFile">
         <id column="kb_file_id" property="id"/>
         <result column="kb_file_name" property="name"/>
         <result column="type" property="typeName"/>
-        <collection property="chunks" ofType="org.xiaoshuyui.simplekb.entity.KbFileChunk">
+        <collection property="chunks" ofType="org.xiaoshuyui.simplekb.entity.kb.KbFileChunk">
             <id column="chunk_id" property="id"/>
             <result column="chunk_content" property="content"/>
         </collection>
@@ -88,7 +88,7 @@
 
 
 
-    <resultMap id="FileBasic" type="org.xiaoshuyui.simplekb.entity.KbFile">
+    <resultMap id="FileBasic" type="org.xiaoshuyui.simplekb.entity.kb.KbFile">
         <id column="kb_file_id" property="id"/>
         <result property="name" column="kb_file_name"/>
         <result property="typeName" column="type_name"/>
@@ -120,7 +120,7 @@
         </foreach>
     </select>
 
-    <resultMap id="FileChunksResultMap" type="org.xiaoshuyui.simplekb.entity.KbFileChunk">
+    <resultMap id="FileChunksResultMap" type="org.xiaoshuyui.simplekb.entity.kb.KbFileChunk">
         <id column="chunk_id" property="id"/>
         <result property="content" column="chunk_content"/>
         <result property="fileId" column="file_id"/>
