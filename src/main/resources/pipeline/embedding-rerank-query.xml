@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pipeline result="org.xiaoshuyui.simplekb.pipeline.output.KbQueryOutput">
+    <step id="1" name="start-action" inputkey="" outputkey="" inputtype="" outputtype="">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PStartAction"/>
+        <next step="2"/>
+    </step>
+    <step id="2" name="embedding" inputkey="{question}" outputkey="embedding-result" inputtype="java.lang.String"
+          outputtype="org.xiaoshuyui.simplekb.pipeline.output.EmbeddingOutput">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PEmbedding"/>
+        <next step="3"/>
+    </step>
+    <step id="3" name="rerank" inputkey="embedding-result" outputkey="rerank-result"
+          inputtype="org.xiaoshuyui.simplekb.pipeline.output.EmbeddingOutput"
+          outputtype="org.xiaoshuyui.simplekb.pipeline.output.RerankOutput">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PRerank"/>
+        <next step="4"/>
+    </step>
+    <step id="4" name="end-action" inputkey="" outputkey="" inputtype="" outputtype="">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PEndAction"/>
+    </step>
+</pipeline>
