@@ -39,12 +39,11 @@ public class HistoryQuestion {
      */
     @JsonIgnore
     private int isDeleted;
+    @TableField(exist = false)
+    private HistoryAnswer answer;
 
-    public HistoryQuestion(Long questionId,String content){
+    public HistoryQuestion(Long questionId, String content) {
         this.historyQuestionId = questionId;
         this.content = content;
     }
-
-    @TableField(exist = false)
-    private HistoryAnswer answer;
 }

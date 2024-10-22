@@ -17,7 +17,10 @@ import org.xiaoshuyui.simplekb.documentLoader.CommonLoader;
 import org.xiaoshuyui.simplekb.documentLoader.DocumentParser;
 import org.xiaoshuyui.simplekb.documentLoader.TitlePatternManager;
 import org.xiaoshuyui.simplekb.documentLoader.result.Section;
+import org.xiaoshuyui.simplekb.entity.kb.KbFile;
 import org.xiaoshuyui.simplekb.entity.request.BatchInsertData;
+import org.xiaoshuyui.simplekb.entity.response.FileList;
+import org.xiaoshuyui.simplekb.entity.response.GetTypesResponse;
 import org.xiaoshuyui.simplekb.entity.response.UploadFileByTypeResponse;
 import org.xiaoshuyui.simplekb.mapper.KbFileChunkKeywordsMapper;
 import org.xiaoshuyui.simplekb.service.KbFileService;
@@ -63,7 +66,7 @@ public class FileController {
      * @return 文件类型列表
      */
     @GetMapping("/types")
-    public Result getFileTypes() {
+    public Result<GetTypesResponse> getFileTypes() {
         return Result.OK_data(kbFileTypeService.getTypeDetails());
     }
 
@@ -75,7 +78,7 @@ public class FileController {
      */
     @Deprecated(since = "for test")
     @GetMapping("/file-with-keywords")
-    public Result getFileWithKeywords(@Param("keyword") String keyword) {
+    public Result<List<KbFile>> getFileWithKeywords(@Param("keyword") String keyword) {
         return Result.OK_data(kbFileChunkKeywordsMapper.getFileWithKeywords(Collections.singletonList(keyword)));
     }
 
@@ -86,7 +89,7 @@ public class FileController {
      * @return 文件和关键字信息
      */
     @GetMapping("/file-with-keywords-by-id")
-    public Result getFileWithKeywordsById(@Param("fileId") Long fileId) {
+    public Result<KbFile> getFileWithKeywordsById(@Param("fileId") Long fileId) {
         return Result.OK_data(kbFileService.getFileWithKeywordsById(fileId));
     }
 
@@ -98,7 +101,7 @@ public class FileController {
      * @return 文件和关键字信息
      */
     @GetMapping("/file-with-keywords-by-type")
-    public Result getFileWithKeywordsByType(@Param("type") Long type, @Param("pageId") int pageId) {
+    public Result<FileList> getFileWithKeywordsByType(@Param("type") Long type, @Param("pageId") int pageId) {
         return Result.OK_data(kbFileService.getFileWithKeywordsByType(type, pageId, pageSize));
     }
 

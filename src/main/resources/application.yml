@@ -3,6 +3,11 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+  neo4j:
+    uri: ${NEO4J_URI:bolt://localhost:7687}
+    authentication:
+      username: ${NEO4J_USER:neo4j}
+      password: ${NEO4J_PASSWORD:12345678}
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:127.0.0.1:3307}/simplekb?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&characterSetResults=utf8&useSSL=false&allowMultiQueries=true
     username: root
@@ -11,6 +16,11 @@ spring:
     hikari:
       max-lifetime: 1800000
       idle-timeout: 600000
+  sql:  # disable init sql
+    init:
+      mode: never
+    validation:
+      query: NONE
 
   ai:
     openai:

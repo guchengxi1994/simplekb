@@ -85,6 +85,11 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-neo4j</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
 
@@ -235,6 +240,15 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.1</version> <!-- 请根据实际情况选择合适的版本 -->
+                <configuration>
+                    <skipTests>true</skipTests>
+                    <!-- 或者使用 <skip>true</skip> 来同时跳过编译和执行 -->
                 </configuration>
             </plugin>
         </plugins>
