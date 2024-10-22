@@ -5,10 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.xiaoshuyui.simplekb.SpringContextUtil;
 import org.xiaoshuyui.simplekb.config.AppConfig;
 import org.xiaoshuyui.simplekb.pipeline.DynamicType;
-import org.xiaoshuyui.simplekb.pipeline.output.EmbeddingOutput;
 import org.xiaoshuyui.simplekb.service.KbFileService;
 import org.xiaoshuyui.simplekb.service.QdrantService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +20,7 @@ public class PEmbedding implements Action {
     private final int topK;
     private final KbFileService kbFileService;
 
-    public PEmbedding(){
+    public PEmbedding() {
         this.qdrantService = SpringContextUtil.getBean(QdrantService.class);
         this.topK = SpringContextUtil.getBean(AppConfig.class).topK();
         this.kbFileService = SpringContextUtil.getBean(KbFileService.class);
@@ -33,7 +33,7 @@ public class PEmbedding implements Action {
         if (input == null) {
             return;
         }
-        if (!DynamicType.typeCheck(input, inputType)){
+        if (!DynamicType.typeCheck(input, inputType)) {
             return;
         }
 
@@ -43,9 +43,10 @@ public class PEmbedding implements Action {
             result = qdrantService.searchVector(qdrantService.getEmbedding(question), topK);
             List<Long> chunkIds = result.stream().map(x -> x.getId().getNum()).toList();
             var fileWithChunks = kbFileService.getFileWithChunksV2(chunkIds);
-            EmbeddingOutput output = new EmbeddingOutput();
-            output.setKbFiles(fileWithChunks);
-            output.setQuestion(question);
+            Map<String, Object> data = new HashMap<>();
+            data.put("question", question);
+            data.put("kbFiles", fileWithChunks);
+            Object output = DynamicType.newObject(data, outputType);
             obj.put(outputKey, output);
         } catch (Exception e) {
             throw new RuntimeException(e);

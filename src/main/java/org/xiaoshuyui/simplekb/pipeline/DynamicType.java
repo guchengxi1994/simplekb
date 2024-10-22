@@ -1,7 +1,14 @@
 package org.xiaoshuyui.simplekb.pipeline;
 
-import java.lang.reflect.Method;
+import lombok.extern.slf4j.Slf4j;
+import org.xiaoshuyui.simplekb.pipeline.output.OutputMeta;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+
+@Slf4j
 public class DynamicType {
 
     public static Object convertToOutputType(Object value, String outputType) throws Exception {
@@ -30,5 +37,31 @@ public class DynamicType {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public static Object newObject(Map<String, Object> obj, List<String> parameters, String outputType) throws Exception {
+        Class<?> outputClass = Class.forName(outputType);
+        Object output = outputClass.getDeclaredConstructor().newInstance();
+        for (String parameter : parameters) {
+            Field field = outputClass.getDeclaredField(parameter);
+            field.setAccessible(true);
+            field.set(output, obj.get(parameter));
+        }
+
+        return output;
+    }
+
+
+    public static Object newObject(Map<String, Object> obj, String outputType) throws Exception {
+        Class<?> outputClass = Class.forName(outputType);
+        Object output = outputClass.getDeclaredConstructor().newInstance();
+        List<String> parameters = ((OutputMeta) output).getFields();
+        for (String parameter : parameters) {
+            Field field = outputClass.getDeclaredField(parameter);
+            field.setAccessible(true);
+            field.set(output, obj.get(parameter));
+        }
+
+        return output;
     }
 }

@@ -1,7 +1,7 @@
 package org.xiaoshuyui.simplekb;
 
-import org.junit.jupiter.api.Test;
 import com.hankcs.hanlp.HanLP;
+import org.junit.jupiter.api.Test;
 
 public class HanlpSummaryTest {
 

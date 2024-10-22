@@ -86,8 +86,6 @@
     </resultMap>
 
 
-
-
     <resultMap id="FileBasic" type="org.xiaoshuyui.simplekb.entity.kb.KbFile">
         <id column="kb_file_id" property="id"/>
         <result property="name" column="kb_file_name"/>
@@ -108,11 +106,11 @@
 
     <select id="getFileBasicInfo" resultMap="FileBasic">
         SELECT
-            f.kb_file_id,
-            f.kb_file_name,
-            t.type_name
+        f.kb_file_id,
+        f.kb_file_name,
+        t.type_name
         FROM kb_file f
-                 LEFT JOIN kb_file_type t ON f.kb_file_type = t.type_id
+        LEFT JOIN kb_file_type t ON f.kb_file_type = t.type_id
         WHERE f.is_deleted = 0
         AND f.kb_file_id IN
         <foreach item="id" collection="fileIds" open="(" separator="," close=")">

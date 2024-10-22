@@ -531,10 +531,11 @@ public class LLMController {
         StringBuilder sb = new StringBuilder();
         int i = 1;
         for (var c : chunks) {
-            sb.append("第").append(i++).append("条信息：").append(c).append("\n\n");
+            sb.append("第").append(i).append("条信息：").append(c).append("\n\n");
             if (sb.length() > maxLength) {
                 return sb.toString();
             }
+            i++;
         }
 
         return sb.toString();

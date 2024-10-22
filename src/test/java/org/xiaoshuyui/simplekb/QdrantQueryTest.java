@@ -54,7 +54,7 @@ public class QdrantQueryTest {
         var results = client.searchAsync(points).get();
 
         results.forEach(result -> {
-            log.info("id:{} score: {} ",result.getId().getNum(), result.getScore());
+            log.info("id:{} score: {} ", result.getId().getNum(), result.getScore());
             log.info("content {}", result.getPayload().get("content").getStringValue());
         });
     }

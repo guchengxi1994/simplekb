@@ -13,6 +13,19 @@ import java.util.List;
 
 public class CsvLoaderTest {
 
+    @Test
+    public void test() throws Exception {
+        InputStream inputStream = CsvLoaderTest.class.getClassLoader().getResourceAsStream("test-upload.csv");
+
+        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
+        HeaderColumnNameMappingStrategy<CsvData> strategy = new HeaderColumnNameMappingStrategy<>();
+        strategy.setType(CsvData.class);
+        CsvToBean csvToBean = new CsvToBeanBuilder<CsvData>(inputStreamReader).withMappingStrategy(strategy).build();
+
+        var result = csvToBean.parse();
+        result.forEach(System.out::println);
+    }
+
     @Data
     static public class CsvData {
         @CsvBindByName(column = "title")
@@ -28,18 +41,5 @@ public class CsvLoaderTest {
         public List<String> getKeywordsList() {
             return List.of(keywords.split(";"));
         }
-    }
-
-    @Test
-    public void test() throws Exception {
-        InputStream inputStream = CsvLoaderTest.class.getClassLoader().getResourceAsStream("test-upload.csv");
-
-        InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "UTF-8");
-        HeaderColumnNameMappingStrategy<CsvData> strategy = new HeaderColumnNameMappingStrategy<>();
-        strategy.setType(CsvData.class);
-        CsvToBean csvToBean = new CsvToBeanBuilder<CsvData>(inputStreamReader).withMappingStrategy(strategy).build();
-
-        var result = csvToBean.parse();
-        result.forEach(System.out::println);
     }
 }

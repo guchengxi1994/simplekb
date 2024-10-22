@@ -40,6 +40,10 @@ public class PQuestionRewriteEngineController {
     @Value("classpath:pipeline/query.xml")
     private Resource queryResource;
 
+
+    @Value("classpath:pipeline/embedding-rerank-query.xml")
+    private Resource embeddingRerankQueryResource;
+
     @GetMapping("/rewrite")
     @Deprecated(since = "for test")
     public Result rewrite(@Param("question") String question) {
@@ -148,6 +152,38 @@ public class PQuestionRewriteEngineController {
                 Map<String, Object> context = new HashMap<>();
                 context.put("{question}", question);
                 context.put("output", pipeline.output);
+                pipeline.execute(context, (String msg) -> SseUtil.sseSend(emitter, msg));
+                SseUtil.sseSend(emitter, "done");
+                emitter.complete();
+            } catch (PipelineException e) {
+                log.error(e.getMessage());
+                SseUtil.sseSend(emitter, e.getMessage());
+                emitter.complete();
+            } catch (Exception e) {
+                log.error(e.getMessage());
+                SseUtil.sseSend(emitter, "流水线内部错误");
+                emitter.complete();
+            }
+        });
+
+
+        return emitter;
+    }
+
+
+    @GetMapping("/embedding-rerank")
+    @Deprecated(since = "for test")
+    public SseEmitter embeddingAndRerank(@Param("question") String question) {
+        SseEmitter emitter = new SseEmitter();
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+            SseUtil.sseSend(emitter, "start");
+
+            log.info("Received question: " + question);
+            try {
+                Pipeline pipeline = PipelineParser.parse(embeddingRerankQueryResource.getInputStream());
+                Map<String, Object> context = new HashMap<>();
+                context.put("{question}", question);
                 pipeline.execute(context, (String msg) -> SseUtil.sseSend(emitter, msg));
                 SseUtil.sseSend(emitter, "done");
                 emitter.complete();
