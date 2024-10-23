@@ -84,5 +84,10 @@ public class PKeywordsSearch implements Action {
         KbQueryOutput output = (KbQueryOutput) obj.get("output");
         output.setIds(chunkIds2);
     }
+
+    @Override
+    public void performBusinessLogic() {
+
+    }
 }
 

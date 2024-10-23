@@ -4,7 +4,7 @@ import io.qdrant.client.grpc.Points;
 import lombok.extern.slf4j.Slf4j;
 import org.xiaoshuyui.simplekb.SpringContextUtil;
 import org.xiaoshuyui.simplekb.config.AppConfig;
-import org.xiaoshuyui.simplekb.pipeline.DynamicType;
+import org.xiaoshuyui.simplekb.pipeline.PipelineException;
 import org.xiaoshuyui.simplekb.service.KbFileService;
 import org.xiaoshuyui.simplekb.service.QdrantService;
 
@@ -29,25 +29,24 @@ public class PEmbedding implements Action {
     @Override
     public void execute(Map<String, Object> obj, String key, String outputKey, String inputType, String outputType, String stepId) {
         obj.put("step", "embedding查询中...");
-        Object input = obj.get(key);
-        if (input == null) {
-            return;
-        }
-        if (!DynamicType.typeCheck(input, inputType)) {
-            return;
-        }
+        Action.super.execute(obj, key, outputKey, inputType, outputType, stepId);
+    }
 
-        String question = (String) input;
-        List<Points.ScoredPoint> result;
+    @Override
+    public void performBusinessLogic() {
+        String question = (String) actionResult.getInput();
+        List<Points.ScoredPoint> searchResult;
         try {
-            result = qdrantService.searchVector(qdrantService.getEmbedding(question), topK);
-            List<Long> chunkIds = result.stream().map(x -> x.getId().getNum()).toList();
+            searchResult = qdrantService.searchVector(qdrantService.getEmbedding(question), topK);
+            List<Long> chunkIds = searchResult.stream().map(x -> x.getId().getNum()).toList();
             var fileWithChunks = kbFileService.getFileWithChunksV2(chunkIds);
             Map<String, Object> data = new HashMap<>();
             data.put("question", question);
             data.put("kbFiles", fileWithChunks);
-            Object output = DynamicType.newObject(data, outputType);
-            obj.put(outputKey, output);
+            actionResult.createOutput(data);
+            if (!actionResult.valid()) {
+                throw new PipelineException(this.getClass().getName() + "流水线执行异常");
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

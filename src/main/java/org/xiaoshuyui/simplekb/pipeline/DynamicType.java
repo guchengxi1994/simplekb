@@ -7,11 +7,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 public class DynamicType {
 
     public static Object convertToOutputType(Object value, String outputType) throws Exception {
+        if (value == null) {
+            return null; // 处理 null 值
+        }
+
         // 根据 outputType 动态获取 Class 对象
         Class<?> targetType = Class.forName(outputType);
 
@@ -22,13 +27,23 @@ public class DynamicType {
             // 特殊处理 String 类型，因为很多对象可以通过 toString() 转换
             return value.toString();
         } else {
-            // 尝试使用目标类型的静态方法 valueOf() 来转换对象
-            Method valueOfMethod = targetType.getMethod("valueOf", String.class);
-            return valueOfMethod.invoke(null, value.toString());
+            try {
+                // 检查是否有 valueOf(String) 静态方法
+                Method valueOfMethod = targetType.getMethod("valueOf", String.class);
+                return valueOfMethod.invoke(null, value.toString());
+            } catch (NoSuchMethodException e) {
+                // 如果没有 valueOf(String) 方法，抛出异常
+                throw new IllegalArgumentException("Cannot convert to type: " + outputType);
+            }
         }
     }
 
+
     public static boolean typeCheck(Object value, String outputType) {
+        if (Objects.equals(outputType, "") || outputType == null) {
+            return true;
+        }
+
         try {
             // 根据 outputType 动态获取 Class 对象
             Class<?> targetType = Class.forName(outputType);

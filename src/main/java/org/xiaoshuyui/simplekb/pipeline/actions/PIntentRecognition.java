@@ -60,5 +60,10 @@ public class PIntentRecognition implements Action {
         // 将识别结果的ID放入输出Map中
         obj.put(outputKey, id);
     }
+
+    @Override
+    public void performBusinessLogic() {
+
+    }
 }
 

@@ -28,18 +28,15 @@ public class PRerank implements Action {
     @Override
     public void execute(Map<String, Object> obj, String key, String outputKey, String inputType, String outputType, String stepId) {
         obj.put("step", "rerank优化中...");
-        Object input = obj.get(key);
-        if (input == null) {
-            return;
-        }
-        if (!DynamicType.typeCheck(input, inputType)) {
-            return;
-        }
+        Action.super.execute(obj, key, outputKey, inputType, outputType, stepId);
+    }
 
-        EmbeddingOutput embeddingOutput = (EmbeddingOutput) input;
+    @Override
+    public void performBusinessLogic() {
+        EmbeddingOutput embeddingOutput = (EmbeddingOutput) actionResult.getInput();
         List<KbFileChunk> chunks = extractChunks(embeddingOutput.getKbFiles());
         var result = rerankChunks(embeddingOutput.getQuestion(), chunks);
-        obj.put(outputKey, result);
+        actionResult.setOutput(result);
         log.info("rerank优化完成 ===> " + result);
     }
 

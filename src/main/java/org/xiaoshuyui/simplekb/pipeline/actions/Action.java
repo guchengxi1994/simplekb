@@ -1,11 +1,16 @@
 package org.xiaoshuyui.simplekb.pipeline.actions;
 
+import org.xiaoshuyui.simplekb.pipeline.ActionResult;
+import org.xiaoshuyui.simplekb.pipeline.PipelineException;
+
 import java.util.Map;
 
 /**
  * 定义一个动作接口，用于执行特定的操作流程
  */
 public interface Action {
+    ActionResult actionResult = new ActionResult();
+
     /**
      * 执行一个特定的动作，并在结果集中记录执行信息
      *
@@ -17,7 +22,21 @@ public interface Action {
      * @param stepId     步骤的唯一标识符，用于在复杂的流程中区分不同的执行步骤
      */
     default void execute(Map<String, Object> obj, String key, String outputKey, String inputType, String outputType, String stepId) {
-        obj.put("step", "流水线执行中...");
+        if (this.getClass().getName().equals("org.xiaoshuyui.simplekb.pipeline.actions.PStartAction") || this.getClass().getName().equals("org.xiaoshuyui.simplekb.pipeline.actions.PEndAction")) {
+            performBusinessLogic();
+            return;
+        }
+
+        obj.put("step", this.getClass().getName() + "流水线执行中...");
+        actionResult.from(obj, key, inputType, outputType);
+        try {
+            performBusinessLogic();
+            obj.put(outputKey, actionResult.getOutput());
+        } catch (Exception e) {
+            throw new PipelineException(this.getClass().getName() + "流水线执行异常");
+        }
     }
+
+    void performBusinessLogic();
 }
 

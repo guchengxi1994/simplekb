@@ -63,5 +63,10 @@ public class PQuestionRewrite implements Action {
         KbQueryOutput output = (KbQueryOutput) obj.get("output");
         output.setRewriteQuestion(r);
     }
+
+    @Override
+    public void performBusinessLogic() {
+
+    }
 }
 
