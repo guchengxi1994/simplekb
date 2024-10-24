@@ -582,4 +582,10 @@ public class LLMController {
         var results = llmService.rerank(query, preResults);
         return stringListToString(results, contextMaxLength);
     }
+
+    @GetMapping("/seg")
+    @Deprecated
+    public Result seg(@Param("text") String text) {
+        return Result.OK_data(HanlpUtils.hanLPSegment(text));
+    }
 }
