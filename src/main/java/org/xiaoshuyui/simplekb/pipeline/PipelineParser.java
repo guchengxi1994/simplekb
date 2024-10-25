@@ -3,7 +3,7 @@ package org.xiaoshuyui.simplekb.pipeline;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
-import org.xiaoshuyui.simplekb.pipeline.actions.Action;
+import org.xiaoshuyui.simplekb.pipeline.actions.IAction;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -59,7 +59,7 @@ public class PipelineParser {
             // 获取并创建Action实例
             Element actionElement = (Element) stepElement.getElementsByTagName("action").item(0);
             String actionClass = actionElement.getAttribute("class");
-            Action action = (Action) Class.forName(actionClass).getDeclaredConstructor().newInstance();
+            IAction action = (IAction) Class.forName(actionClass).getDeclaredConstructor().newInstance();
 
             // 检查并设置PStartAction和PEndAction
             if (actionClass.equals("org.xiaoshuyui.simplekb.pipeline.actions.PStartAction")) {

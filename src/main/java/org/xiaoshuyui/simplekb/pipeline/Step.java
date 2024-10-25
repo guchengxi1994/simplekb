@@ -2,7 +2,7 @@ package org.xiaoshuyui.simplekb.pipeline;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.xiaoshuyui.simplekb.pipeline.actions.Action;
+import org.xiaoshuyui.simplekb.pipeline.actions.IAction;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +18,7 @@ public class Step {
     private String id; // 步骤的唯一标识
     private String name; // 步骤的名称
     private String key; // 步骤的键，用于在上下文中查找数据
-    private Action action; // 步骤要执行的动作
+    private IAction action; // 步骤要执行的动作
     private String nextStepId; // 下一个步骤的ID
 
     private String outputKey; // 步骤执行结果的键，用于在上下文中存储结果
@@ -41,7 +41,7 @@ public class Step {
      * @param outputType 输出数据的类型
      * @param conditions 条件列表，用于确定下一步骤
      */
-    public Step(String id, String name, String key, Action action, String nextStepId, String outputKey, String inputType, String outputType, List<Condition> conditions) {
+    public Step(String id, String name, String key, IAction action, String nextStepId, String outputKey, String inputType, String outputType, List<Condition> conditions) {
         this.id = id;
         this.name = name;
         this.key = key;

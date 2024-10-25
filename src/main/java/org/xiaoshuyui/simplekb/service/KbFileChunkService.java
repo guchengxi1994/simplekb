@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.xiaoshuyui.simplekb.documentLoader.result.Section;
 import org.xiaoshuyui.simplekb.entity.kb.KbFileChunk;
 import org.xiaoshuyui.simplekb.entity.kb.KbFileChunkKeywords;
+import org.xiaoshuyui.simplekb.entity.kb.KeywordSearchStrategy;
 import org.xiaoshuyui.simplekb.mapper.KbFileChunkMapper;
 
 import java.util.ArrayList;
@@ -131,6 +132,87 @@ public class KbFileChunkService extends ServiceImpl<KbFileChunkMapper, KbFileChu
             }
         }
         return true;
+    }
+
+
+    /**
+     * 执行全文搜索，根据关键词和搜索策略返回匹配的文件块
+     *
+     * @param keywords 关键词列表，用于搜索
+     * @param type     搜索策略，决定关键词组合方式
+     * @param typeId   类型ID，用于限定搜索范围
+     * @param pageId   页码，用于分页搜索
+     * @return 返回匹配的文件块列表
+     */
+    public List<KbFileChunk> fullTextSearch(List<String> keywords, KeywordSearchStrategy type, Long typeId, int pageId) {
+        StringBuilder keyword = new StringBuilder();
+        // 根据搜索策略构建关键词字符串
+        if (type == KeywordSearchStrategy.KEYWORD_ALL) {
+            for (String s : keywords) {
+                keyword.append("+").append(s).append(" ");
+            }
+        } else {
+            for (int i = 0; i < keywords.size(); i++) {
+                if (i == keywords.size() - 1) {
+                    keyword.append(keywords.get(i));
+                } else {
+                    keyword.append(keywords.get(i)).append(" | ");
+                }
+            }
+        }
+
+        // 调用Mapper方法执行分页搜索
+        return kbFileChunkMapper.pagedSearchByKeywords(keyword.toString(), typeId, (pageId - 1) * 10);
+    }
+
+    /**
+     * 执行全文搜索，返回所有匹配的文件块
+     *
+     * @param keywords 关键词列表，用于搜索
+     * @param type     搜索策略，决定关键词组合方式
+     * @param typeId   类型ID，用于限定搜索范围
+     * @return 返回匹配的文件块列表
+     */
+    public List<KbFileChunk> fullTextSearch(List<String> keywords, KeywordSearchStrategy type, Long typeId) {
+        StringBuilder keyword = new StringBuilder();
+        // 根据搜索策略构建关键词字符串
+        if (type == KeywordSearchStrategy.KEYWORD_ALL) {
+            for (String s : keywords) {
+                keyword.append("+").append(s).append(" ");
+            }
+        } else {
+            for (int i = 0; i < keywords.size(); i++) {
+                if (i == keywords.size() - 1) {
+                    keyword.append(keywords.get(i));
+                } else {
+                    keyword.append(keywords.get(i)).append(" | ");
+                }
+            }
+        }
+
+        // 调用Mapper方法执行搜索，返回所有结果
+        return kbFileChunkMapper.allSearchByKeywords(keyword.toString(), typeId);
+    }
+
+    public List<KbFileChunk> fullTextSearch(List<String> keywords, KeywordSearchStrategy type) {
+        StringBuilder keyword = new StringBuilder();
+        // 根据搜索策略构建关键词字符串
+        if (type == KeywordSearchStrategy.KEYWORD_ALL) {
+            for (String s : keywords) {
+                keyword.append("+").append(s).append(" ");
+            }
+        } else {
+            for (int i = 0; i < keywords.size(); i++) {
+                if (i == keywords.size() - 1) {
+                    keyword.append(keywords.get(i));
+                } else {
+                    keyword.append(keywords.get(i)).append(" | ");
+                }
+            }
+        }
+
+        // 调用Mapper方法执行搜索，返回所有结果
+        return kbFileChunkMapper.allSearchByKeywords(keyword.toString(), null);
     }
 }
 

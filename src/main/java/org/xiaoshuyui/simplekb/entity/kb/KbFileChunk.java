@@ -45,6 +45,9 @@ public class KbFileChunk {
     @TableField(value = "keywords", exist = false)
     private List<String> keywords;
 
+    @TableField(exist = false)
+    private String filename;
+
     // 为了提高embedding和rerank的检索准确率，在存储embedding结果时，添加一个
     // 以关键字为主的介绍字段
     // 形如：以下文本与关键字1,关键字2有关：\n

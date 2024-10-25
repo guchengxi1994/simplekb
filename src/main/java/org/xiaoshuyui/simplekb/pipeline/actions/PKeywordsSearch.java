@@ -15,7 +15,7 @@ import java.util.Map;
 // 使用Slf4j进行日志记录
 @Slf4j
 // 实现Action接口，定义关键字搜索的行为
-public class PKeywordsSearch implements Action {
+public class PKeywordsSearch implements IAction {
 
     // 文件块服务，用于全文搜索
     private final KbFileChunkService kbFileChunkService;

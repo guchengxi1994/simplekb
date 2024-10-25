@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * 定义一个动作接口，用于执行特定的操作流程
  */
-public interface Action {
+public interface IAction {
     ActionResult actionResult = new ActionResult();
 
     /**

@@ -29,7 +29,7 @@
         <next step="5"/>
     </step>
     <step id="5" name="end-action" inputkey="" outputkey="" inputtype="" outputtype="">
-        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PEndAction"/>
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PEndIAction"/>
     </step>
 
 </pipeline>

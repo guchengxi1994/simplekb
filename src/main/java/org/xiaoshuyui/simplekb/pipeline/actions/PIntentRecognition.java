@@ -11,7 +11,7 @@ import java.util.Map;
 // 使用Slf4j进行日志记录
 @Slf4j
 // 实现Action接口，用于处理意图识别
-public class PIntentRecognition implements Action {
+public class PIntentRecognition implements IAction {
 
     // 定义KbPromptService接口的实例，用于获取提示信息
     private final KbPromptService kbPromptService;

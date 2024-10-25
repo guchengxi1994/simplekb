@@ -1,6 +1,7 @@
 package org.xiaoshuyui.simplekb.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 import org.xiaoshuyui.simplekb.entity.kb.KbFileChunk;
 
 import java.util.List;
@@ -21,4 +22,11 @@ public interface KbFileChunkMapper extends BaseMapper<KbFileChunk> {
      * @return 匹配搜索条件的KbFileChunk列表
      */
     public List<KbFileChunk> searchByKeywords(Map<String, String> keywords);
+
+    List<KbFileChunk> pagedSearchByKeywords(@Param("keywords") String keywords, @Param("typeId") Long typeId, @Param("offset") int offset);
+
+
+    List<KbFileChunk> allSearchByKeywords(@Param("keywords") String keywords, @Param("typeId") Long typeId);
+
+    List<KbFileChunk> searchByIds(@Param("ids") List<Long> ids);
 }

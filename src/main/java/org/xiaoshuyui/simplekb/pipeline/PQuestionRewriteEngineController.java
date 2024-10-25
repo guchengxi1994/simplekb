@@ -15,10 +15,11 @@ import org.w3c.dom.NodeList;
 import org.xiaoshuyui.simplekb.SpringContextUtil;
 import org.xiaoshuyui.simplekb.common.response.Result;
 import org.xiaoshuyui.simplekb.common.utils.SseUtil;
-import org.xiaoshuyui.simplekb.pipeline.actions.Action;
+import org.xiaoshuyui.simplekb.pipeline.actions.IAction;
 import org.xiaoshuyui.simplekb.pipeline.actions.PEndAction;
 import org.xiaoshuyui.simplekb.pipeline.actions.PKeywordsSearch;
 import org.xiaoshuyui.simplekb.pipeline.actions.PQuestionRewrite;
+import org.xiaoshuyui.simplekb.pipeline.input.KeywordExtractInput;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -33,7 +34,7 @@ import java.util.concurrent.Executors;
 @Slf4j
 public class PQuestionRewriteEngineController {
     static Document document = null;
-    private Map<String, Action> actions = new HashMap<>();
+    private Map<String, IAction> actions = new HashMap<>();
     @Value("classpath:pipeline/kb-query-pipeline.xml")
     private Resource xmlResource;
 
@@ -43,6 +44,9 @@ public class PQuestionRewriteEngineController {
 
     @Value("classpath:pipeline/embedding-rerank-query.xml")
     private Resource embeddingRerankQueryResource;
+
+    @Value("classpath:pipeline/fulltextsearch-embedding-rerank-query.xml")
+    private Resource fullTextSearchEmbeddingRerankQueryResource;
 
     @GetMapping("/rewrite")
     @Deprecated(since = "for test")
@@ -90,7 +94,7 @@ public class PQuestionRewriteEngineController {
                 Node actionNode = step.getElementsByTagName("action").item(0);
                 if (actionNode != null && actionNode.getAttributes() != null) {
                     String actionClass = actionNode.getAttributes().getNamedItem("class").getNodeValue();
-                    Action action = actions.get(actionClass);
+                    IAction action = actions.get(actionClass);
                     if (action != null) {
                         log.info("Executing action: " + actionClass + "workflowData: " + workflowData);
                         action.execute(workflowData, key, null, null, null, stepId); // 执行action并获取输出
@@ -184,6 +188,39 @@ public class PQuestionRewriteEngineController {
                 Pipeline pipeline = PipelineParser.parse(embeddingRerankQueryResource.getInputStream());
                 Map<String, Object> context = new HashMap<>();
                 context.put("{question}", question);
+                pipeline.execute(context, (String msg) -> SseUtil.sseSend(emitter, msg));
+                SseUtil.sseSend(emitter, "done");
+                emitter.complete();
+            } catch (PipelineException e) {
+                log.error(e.getMessage());
+                SseUtil.sseSend(emitter, e.getMessage());
+                emitter.complete();
+            } catch (Exception e) {
+                log.error(e.getMessage());
+                SseUtil.sseSend(emitter, "流水线内部错误");
+                emitter.complete();
+            }
+        });
+
+
+        return emitter;
+    }
+
+
+    @GetMapping("/fts-embedding-rerank")
+    @Deprecated(since = "for test")
+    public SseEmitter ftsEmbeddingAndRerank(@Param("question") String question) {
+        SseEmitter emitter = new SseEmitter();
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+            SseUtil.sseSend(emitter, "start");
+
+            log.info("Received question: " + question);
+            try {
+                Pipeline pipeline = PipelineParser.parse(fullTextSearchEmbeddingRerankQueryResource.getInputStream());
+                Map<String, Object> context = new HashMap<>();
+                KeywordExtractInput keywordExtractInput = new KeywordExtractInput(question);
+                context.put("keyword-extract-input", keywordExtractInput);
                 pipeline.execute(context, (String msg) -> SseUtil.sseSend(emitter, msg));
                 SseUtil.sseSend(emitter, "done");
                 emitter.complete();

@@ -5,7 +5,6 @@ import org.xiaoshuyui.simplekb.SpringContextUtil;
 import org.xiaoshuyui.simplekb.config.AppConfig;
 import org.xiaoshuyui.simplekb.entity.kb.KbFile;
 import org.xiaoshuyui.simplekb.entity.kb.KbFileChunk;
-import org.xiaoshuyui.simplekb.pipeline.DynamicType;
 import org.xiaoshuyui.simplekb.pipeline.output.EmbeddingOutput;
 import org.xiaoshuyui.simplekb.service.LLMService;
 
@@ -14,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-public class PRerank implements Action {
+public class PRerank implements IAction {
 
     private final int contextMaxLength;
 
@@ -28,7 +27,7 @@ public class PRerank implements Action {
     @Override
     public void execute(Map<String, Object> obj, String key, String outputKey, String inputType, String outputType, String stepId) {
         obj.put("step", "rerank优化中...");
-        Action.super.execute(obj, key, outputKey, inputType, outputType, stepId);
+        IAction.super.execute(obj, key, outputKey, inputType, outputType, stepId);
     }
 
     @Override
@@ -70,7 +69,7 @@ public class PRerank implements Action {
         StringBuilder sb = new StringBuilder();
         int i = 1;
         for (var c : chunks) {
-            sb.append("第").append(i).append("条信息：").append(c).append("\n\n");
+            sb.append(c).append("\n\n");
             if (sb.length() > maxLength) {
                 return sb.toString();
             }
@@ -84,7 +83,7 @@ public class PRerank implements Action {
         StringBuilder sb = new StringBuilder();
         int i = 1;
         for (var c : chunks) {
-            sb.append("第").append(i++).append("条信息：").append(c).append("\n\n");
+            sb.append(c).append("\n\n");
         }
 
         return sb.toString();

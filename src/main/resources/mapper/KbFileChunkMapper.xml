@@ -9,12 +9,43 @@
         <result property="createAt" column="create_at"/>
         <result property="updateAt" column="update_at"/>
         <result property="isDeleted" column="is_deleted"/>
+        <result property="filename" column="kb_file_name"/>
     </resultMap>
 
     <select id="searchByKeywords" parameterType="map" resultMap="kbFileChunkResultMap">
-        SELECT *
-        FROM kb_file_chunk
-        WHERE MATCH (chunk_content)
+        SELECT kfc.*, kf.kb_file_name
+        FROM kb_file_chunk kfc
+                 LEFT JOIN kb_file  kf on kf.kb_file_id = kfc.file_id
+        WHERE MATCH (kfc.chunk_content)
             AGAINST(#{keywords} IN BOOLEAN MODE);
+    </select>
+
+    <select id="pagedSearchByKeywords" resultMap="kbFileChunkResultMap">
+        SELECT kfc.*, kf.kb_file_name
+        FROM kb_file_chunk kfc
+                 LEFT JOIN kb_file  kf on kf.kb_file_id = kfc.file_id
+        WHERE MATCH (kfc.chunk_content)
+            AGAINST(#{keywords} IN BOOLEAN MODE)
+          and kf.kb_file_type = #{typeId}
+            LIMIT #{offset}, 10;
+    </select>
+
+    <select id="allSearchByKeywords" resultMap="kbFileChunkResultMap">
+        SELECT kfc.*, kf.kb_file_name
+        FROM kb_file_chunk kfc
+                 LEFT JOIN kb_file  kf on kf.kb_file_id = kfc.file_id
+        WHERE MATCH (kfc.chunk_content)
+            AGAINST(#{keywords} IN BOOLEAN MODE)
+        <if test="typeId != null">
+            and kf.kb_file_type = #{typeId}
+        </if>
+    </select>
+    <select id="searchByIds" resultType="org.xiaoshuyui.simplekb.entity.kb.KbFileChunk">
+        SELECT chunk_content as content
+        FROM kb_file_chunk
+        WHERE chunk_id IN
+        <foreach collection="ids" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </select>
 </mapper>

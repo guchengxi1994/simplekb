@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<pipeline result="">
+    <step id="1" name="start-action" inputkey="" outputkey="" inputtype="" outputtype="">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PStartAction"/>
+        <next step="2"/>
+    </step>
+    <step id="2" name="keyword-extract" inputkey="keyword-extract-input" outputkey="keyword-extract-output"
+          inputtype="org.xiaoshuyui.simplekb.pipeline.input.KeywordExtractInput"
+          outputtype="org.xiaoshuyui.simplekb.pipeline.output.KeywordExtractOutput">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PKeywordExtraction"/>
+        <next step="3"/>
+    </step>
+    <step id="3" name="full-text-search" inputkey="keyword-extract-output" outputkey="full-text-search-output"
+          inputtype="org.xiaoshuyui.simplekb.pipeline.output.KeywordExtractOutput"
+          outputtype="org.xiaoshuyui.simplekb.pipeline.output.FullTextSearchOutput">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.FullTextSearchAction"/>
+        <next step="4"/>
+    </step>
+    <step id="4" name="embedding" inputkey="full-text-search-output" outputkey="embedding-result"
+          inputtype="org.xiaoshuyui.simplekb.pipeline.output.FullTextSearchOutput"
+          outputtype="org.xiaoshuyui.simplekb.pipeline.output.EmbeddingOutput">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PEmbedding"/>
+        <next step="5"/>
+    </step>
+    <step id="5" name="rerank" inputkey="embedding-result" outputkey="rerank-result"
+          inputtype="org.xiaoshuyui.simplekb.pipeline.output.EmbeddingOutput"
+          outputtype="org.xiaoshuyui.simplekb.pipeline.output.RerankOutput">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PRerank"/>
+        <next step="6"/>
+    </step>
+    <step id="6" name="end-action" inputkey="" outputkey="" inputtype="" outputtype="">
+        <action class="org.xiaoshuyui.simplekb.pipeline.actions.PEndAction"/>
+    </step>
+</pipeline>

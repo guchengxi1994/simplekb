@@ -15,18 +15,12 @@ public class ActionResult {
     Object input;
     Object output;
 
-
-    public boolean valid() {
-        return DynamicType.typeCheck(input, inputType) && DynamicType.typeCheck(output, outputType);
-    }
-
-
-    public static ActionResult fromMap(Map<String, Object> obj, String key, String inputType,String outputType) {
+    public static ActionResult fromMap(Map<String, Object> obj, String key, String inputType, String outputType) {
         Object o = obj.getOrDefault(key, null);
         if (o == null) {
             return null;
         }
-        if (!DynamicType.typeCheck(o, inputType)){
+        if (!DynamicType.typeCheck(o, inputType)) {
             return null;
         }
         ActionResult result = new ActionResult();
@@ -36,21 +30,24 @@ public class ActionResult {
         return result;
     }
 
+    public boolean valid() {
+        return DynamicType.typeCheck(input, inputType) && DynamicType.typeCheck(output, outputType);
+    }
 
-    public void from(Map<String, Object> obj, String key, String inputType,String outputType) {
+    public void from(Map<String, Object> obj, String key, String inputType, String outputType) {
         Object o = obj.getOrDefault(key, null);
         if (o == null) {
-            return ;
+            return;
         }
-        if (!DynamicType.typeCheck(o, inputType)){
-            return ;
+        if (!DynamicType.typeCheck(o, inputType)) {
+            return;
         }
         this.setInput(o);
         this.setInputType(inputType);
         this.setOutputType(outputType);
     }
 
-    public void createOutput(Map<String, Object> data) throws Exception{
+    public void createOutput(Map<String, Object> data) throws Exception {
         Object output = DynamicType.newObject(data, outputType);
         this.setOutput(output);
     }

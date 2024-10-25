@@ -11,7 +11,7 @@ import java.util.Map;
 // 使用Slf4j进行日志记录
 @Slf4j
 // PQuestionRewrite类实现了Action接口，用于重写问题
-public class PQuestionRewrite implements Action {
+public class PQuestionRewrite implements IAction {
     // 注入KbPromptService服务
     private final KbPromptService kbPromptService;
     // 注入LLMService服务
