@@ -67,13 +67,11 @@ public class PRerank implements IAction {
 
     String stringListToString(List<String> chunks, int maxLength) {
         StringBuilder sb = new StringBuilder();
-        int i = 1;
         for (var c : chunks) {
             sb.append(c).append("\n\n");
             if (sb.length() > maxLength) {
                 return sb.toString();
             }
-            i++;
         }
 
         return sb.toString();
@@ -81,7 +79,6 @@ public class PRerank implements IAction {
 
     String stringListToString(List<String> chunks) {
         StringBuilder sb = new StringBuilder();
-        int i = 1;
         for (var c : chunks) {
             sb.append(c).append("\n\n");
         }
